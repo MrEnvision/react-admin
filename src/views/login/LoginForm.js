@@ -12,6 +12,11 @@ class LoginForm extends Component {
     this.props.switchForm('register');
   };
 
+  // 提交表单
+  onFinish = (values) => {
+    console.log(values);
+  };
+
   render() {
     return (
       <div className="form">
@@ -21,16 +26,29 @@ class LoginForm extends Component {
             账号注册
           </span>
         </div>
-        <Form name="loginForm" className="form__content">
+        <Form
+          name="loginForm"
+          className="form__content"
+          onFinish={this.onFinish}
+        >
           <Form.Item
             name="username"
-            rules={[{ required: true, message: '请输入用户名!' }]}
+            rules={[
+              { required: true, message: '请输入邮箱!' },
+              { type: 'email', message: '邮箱格式不正确！' },
+            ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="用户名" />
+            <Input prefix={<UserOutlined />} placeholder="邮箱" />
           </Form.Item>
           <Form.Item
             name="password"
-            rules={[{ required: true, message: '请输入密码!' }]}
+            rules={[
+              { required: true, message: '请输入密码!' },
+              {
+                pattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/,
+                message: '密码为6-20位的字母或数字！',
+              },
+            ]}
           >
             <Input
               prefix={<LockOutlined />}
@@ -38,7 +56,13 @@ class LoginForm extends Component {
               placeholder="密码"
             />
           </Form.Item>
-          <Form.Item name="code">
+          <Form.Item
+            name="code"
+            rules={[
+              { required: true, message: '请输入验证码！' },
+              { len: 6, message: '验证码为6位！' },
+            ]}
+          >
             <Row gutter={16}>
               <Col span={15}>
                 <Input prefix={<SafetyOutlined />} placeholder="验证码" />
