@@ -163,3 +163,84 @@ export default App;
 import {Fragment} from 'react'
 ```
 
+## 第5课时
+
+### 5.1 函数定义方法
+
+1、箭头函数声明（常用）
+
+```react
+class Account extends React.Component {
+    click = () => {
+        alert('click')
+    }
+
+    render() {
+        return (
+            <div>
+                <button onClick={this.click}>点击</button>
+            </div>
+        )
+    }
+}
+```
+
+2、构造器内声明 - bind绑定
+
+```react
+class Account extends React.Component {
+    constructor(props) {
+        super(props);
+        this.click = this.click.bind(this)
+    }
+
+    click() {
+        alert('click')
+    }
+
+    render() {
+        return (
+            <div>
+                <button onClick={this.click}>点击</button>
+            </div>
+        )
+    }
+}
+```
+
+3、直接bind绑定，与2的区别在于在使用处绑定this
+
+```react
+class Account extends React.Component {
+    click() {
+        alert('click')
+    }
+
+    render() {
+        return (
+            <div>
+                <button onClick={this.click.bind(this)}>点击</button>
+            </div>
+        )
+    }
+}
+```
+
+4、使用时使用箭头函数
+
+```react
+class Account extends React.Component {
+    click() {
+        alert('click')
+    }
+
+    render() {
+        return (
+            <div>
+                <button onClick={() => this.click()}>点击</button>
+            </div>
+        )
+    }
+}
+```
+
