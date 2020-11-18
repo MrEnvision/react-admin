@@ -248,3 +248,95 @@ class Account extends React.Component {
 
 略。
 
+## 第6课时
+
+略。
+
+## 第7课时
+
+### 7.1 跨域配置
+
+1、安装依赖 - http-proxy-middleware
+
+```shell
+$npm i http-proxy-middleware
+```
+
+2、创建文件src/setupProxy.js
+
+```js
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+module.exports = function (app) {
+    app.use(createProxyMiddleware("/devApi", {
+        target: "http://www.web-jshtml.cn/api/react", //配置你要请求的服务器地址
+        changeOrigin: true,
+        pathRewrite: {
+            "^/devApi": "",
+        },
+    }))
+};
+```
+
+### 7.2 请求拦截器
+
+1、安装依赖
+
+```shell
+$npm i axios --save
+```
+
+2、拦截器 interceptor.js
+
+```javascript
+import axios from 'axios'
+
+// 第一步：创建实例
+const service = axios.create({
+    baseURL: "/devApi"
+    timeout: 5000,
+})
+
+// 第二步：请求拦截
+service.interceptors.request.use((config) => {
+    // 在发送请求之前做些什么
+    return config
+}, (error) => {
+    // 对请求错误做些什么
+    return Promise.reject(error)
+})
+
+// 第三步：响应拦截
+service.interceptors.response.use((response) => {
+    // 对响应数据做点什么
+    return response
+}, (error) => {
+    // 对响应错误做点什么
+    return Promise.reject(error)
+})
+
+export default service
+```
+
+<img src="./noteImg/拦截器3个步骤.png" style="zoom:75%;" />
+
+### 7.3 项目环境（变量）
+
+**项目环境**
+
+- 开发环境 - npm start
+- 测试环境（线上服务器-对内）- npm run test 
+- 生成环境（线上服务器-对外）- npm run build
+
+**环境变量**
+
+create-react-app 创建的项目有内置的环境变量 NODE_ENV，可通过 `process.env.NODE_ENV` 读取变量，默认为 3 个值：development（开发）、test（测试）、production（生产） 。另外也可以创建文件 `.env.development`、`.env.production`、`.env.test` 来自定义环境变量，里面的环境变量必须以 `REACT_APP_` 开头，其他地方可以通过 `process.env.变量名 `获取。
+
+```javascript
+// .env.development
+REACT_APP_API = "/devApi" //注意，自定义一定是 REACT_APP_ 开头
+
+// 其他地方
+process.env.REACT_APP_API
+```
+

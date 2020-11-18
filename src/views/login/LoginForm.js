@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Col, Form, Input, Row } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
+import { Login } from '../../api/account';
 
 class LoginForm extends Component {
   constructor(props) {
@@ -14,7 +15,13 @@ class LoginForm extends Component {
 
   // 提交表单
   onFinish = (values) => {
-    console.log(values);
+    Login(values)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   render() {
