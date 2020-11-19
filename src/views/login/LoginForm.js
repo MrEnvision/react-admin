@@ -1,16 +1,39 @@
 import React, { Component } from 'react';
 import { Button, Col, Form, Input, Row } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
+import CodeButton from '../../components/login/CodeButton';
 import { Login } from '../../api/account';
 
 class LoginForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      username: 'shen@qq.com',
+      password: '1234sw',
+      code: '',
+    };
   }
 
+  // 跳转至注册
   toggleForm = () => {
     this.props.switchForm('register');
+  };
+
+  // 输入绑定
+  inputChangeUsername = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
+  };
+  inputChangePassword = (e) => {
+    this.setState({
+      password: e.target.value,
+    });
+  };
+  inputChangeCode = (e) => {
+    this.setState({
+      code: e.target.value,
+    });
   };
 
   // 提交表单
@@ -25,6 +48,7 @@ class LoginForm extends Component {
   };
 
   render() {
+    const { username } = this.state;
     return (
       <div className="form">
         <div className="form__header">
@@ -45,7 +69,12 @@ class LoginForm extends Component {
               { type: 'email', message: '邮箱格式不正确！' },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="邮箱" />
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="邮箱"
+              onChange={this.inputChangeUsername}
+              defaultValue={username}
+            />
           </Form.Item>
           <Form.Item
             name="password"
@@ -61,6 +90,8 @@ class LoginForm extends Component {
               prefix={<LockOutlined />}
               type="password"
               placeholder="密码"
+              onChange={this.inputChangePassword}
+              defaultValue={this.state.password}
             />
           </Form.Item>
           <Form.Item
@@ -72,12 +103,14 @@ class LoginForm extends Component {
           >
             <Row gutter={16}>
               <Col span={15}>
-                <Input prefix={<SafetyOutlined />} placeholder="验证码" />
+                <Input
+                  prefix={<SafetyOutlined />}
+                  placeholder="验证码"
+                  onChange={this.inputChangeCode}
+                />
               </Col>
               <Col span={9}>
-                <Button type="danger" className="login-form-button">
-                  获取验证码
-                </Button>
+                <CodeButton username={username} module="login" />
               </Col>
             </Row>
           </Form.Item>

@@ -340,3 +340,134 @@ REACT_APP_API = "/devApi" //注意，自定义一定是 REACT_APP_ 开头
 process.env.REACT_APP_API
 ```
 
+## 第8课时
+
+### 8.1 双向绑定的区别
+
+React 不同于 Vue 存在 v-model 可以实现双向绑定，React 中表单等需要通过监听函数来实现对数据的更新。
+
+```jsx
+class Demo extends React.Component{
+  constructor(){
+    super();
+    this.state = {
+      num: 0,
+    }
+  }
+  
+  changeNum = (e) => {
+    this.setState({
+      num: e.target.value
+    });
+  }
+  
+  render(){
+    const { num } = this.state;
+    return (
+      <div>
+        <input value={num} onChange=this.changeNum/>
+      </div>
+    )
+  }
+}
+```
+
+## 第9课时
+
+略。
+
+### 第10课时
+
+### 10.1 组件类型
+
+1、无状态组件（函数组件）
+
+> 无状态组件是最基础的组件形式，由于没有状态的影响所以就是纯静态展示的作用。属性（props）加上一个渲染函数（render）。复用性比较强。
+
+```react
+function Component(props) {
+  let name = 'Sherwin'
+  return (
+    <div>hello world, {name}!</div>
+  )
+}
+```
+
+2、有状态组件
+
+> 组件内部包含状态（state）且状态随着事件或者外部的消息而发生改变。有状态组件通常会带有生命周期(lifecycle)。
+
+```react
+import React from 'react'
+
+class Component extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      name: 'Sherwin'
+    }
+  }
+  render() {
+    const {name} = this.state 
+    return ({
+       <div>hello world, {name}!</div>
+    })
+  }
+}
+```
+
+3、UI组件
+
+> 负责数据的渲染，通过属性 props 接收外部数据加上 render 函数。
+
+4、容器组件
+
+> axios 数据的获取以及处理逻辑上的事，不负责数据的渲染。
+
+5、高阶组件
+
+> 复用组件逻辑时，它们是 JavaScript 函数，将组件作为参数并返回一个新组件。
+
+### 10.2 生命周期
+
+> 具体详见[React生命周期](https://sherwinshen.gitbook.io/front-end-blog/frameworks/react/react-lifeCycle)
+
+举例 - props同步接收其变化：
+
+```jsx
+class Demo extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      username: this.props.username // 这里面是初始化默认值，后续更新不会获取到
+    }
+  }
+  
+  render(){
+    return (<div>{this.props.name}</div>)  // 外面调用this.props则每次都会去获取一次，能过获取到最新的
+  }
+}
+```
+
+每一次都利用this.props去获取其实没有必要，因此我们需要利用生命周期函数来同步props变化：
+
+```jsx
+class Demo extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      username: this.props.username // 这里面是初始化默认值，后续更新不会获取到
+    }
+  }
+  
+  // 更新props的时候同步更新username
+  static getDerivedStateFromProps(nextProps) {
+    return { username: nextProps.username };
+  }
+  
+  render(){
+    return (<div>{this.state.username}</div>) // 此时state里面的username也同步更新了
+  }
+}
+```
+
