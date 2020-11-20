@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { Button, Col, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import CodeButton from '../../components/login/CodeButton';
 import { Login } from '../../api/account';
+import { setToken } from '../../utils/token';
+import CryptoJs from 'crypto-js';
 
 class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: 'shen@qq.com',
-      password: '1234sw',
+      username: 'sw@qq.com',
+      password: '',
       code: '',
+      submit_button_loading: false,
     };
   }
 
@@ -38,17 +41,38 @@ class LoginForm extends Component {
 
   // 提交表单
   onFinish = (values) => {
-    Login(values)
+    const requestData = {
+      username: values.username,
+      code: values.code,
+      password: CryptoJs.MD5(values.password).toString(),
+    };
+    this.setState({
+      submit_button_loading: true,
+    });
+    Login(requestData)
       .then((response) => {
-        console.log(response);
+        this.setState({
+          submit_button_loading: false,
+        });
+        const data = response.data;
+        if (data.resCode !== 0) {
+          message.error(data.message);
+          return false;
+        }
+        setToken(data.data.token);
+        this.props.history.push('/index');
+        message.success('登录成功！');
       })
       .catch((error) => {
+        this.setState({
+          submit_button_loading: false,
+        });
         console.log(error);
       });
   };
 
   render() {
-    const { username } = this.state;
+    const { username, submit_button_loading } = this.state;
     return (
       <div className="form">
         <div className="form__header">
@@ -61,6 +85,10 @@ class LoginForm extends Component {
           name="loginForm"
           className="form__content"
           onFinish={this.onFinish}
+          initialValues={{
+            username: 'sw@qq.com',
+            password: '1234sw',
+          }}
         >
           <Form.Item
             name="username"
@@ -73,7 +101,6 @@ class LoginForm extends Component {
               prefix={<UserOutlined />}
               placeholder="邮箱"
               onChange={this.inputChangeUsername}
-              defaultValue={username}
             />
           </Form.Item>
           <Form.Item
@@ -91,7 +118,6 @@ class LoginForm extends Component {
               type="password"
               placeholder="密码"
               onChange={this.inputChangePassword}
-              defaultValue={this.state.password}
             />
           </Form.Item>
           <Form.Item
@@ -119,6 +145,7 @@ class LoginForm extends Component {
               type="primary"
               htmlType="submit"
               className="form__content--button"
+              loading={submit_button_loading}
             >
               登录
             </Button>

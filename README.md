@@ -471,3 +471,26 @@ class Demo extends React.Component{
 }
 ```
 
+## 第11课时
+
+### 11.1 密码加密
+
+安装依赖
+
+```shell
+$npm install crypto-js
+```
+
+加密使用
+
+```javascript
+// md5加密
+const pwd = CryptoJs.MD5(password).toString();
+
+// SHA1
+const pwd = CryptoJS.SHA1(password).toString();
+
+// AES加密 - 第二个参数为秘钥(自定义)
+const secretKey = 'sherwinShen';
+const pwd = CryptoJS.AES.encrypt(password, secretKey).toString();
+```

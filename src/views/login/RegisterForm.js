@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Col, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import CodeButton from '../../components/login/CodeButton';
+import { Register } from '../../api/account';
+import CryptoJs from 'crypto-js';
 
 class RegisterForm extends Component {
   constructor(props) {
@@ -10,6 +12,7 @@ class RegisterForm extends Component {
       username: '',
       password: '',
       code: '',
+      submit_button_loading: false,
     };
   }
 
@@ -37,11 +40,37 @@ class RegisterForm extends Component {
 
   // 提交表单
   onFinish = (values) => {
-    console.log(values);
+    const requestData = {
+      username: values.username,
+      password: CryptoJs.MD5(values.password).toString(),
+      code: values.code,
+    };
+    this.setState({
+      submit_button_loading: true,
+    });
+    Register(requestData)
+      .then((response) => {
+        this.setState({
+          submit_button_loading: false,
+        });
+        const data = response.data;
+        if (data.resCode !== 0) {
+          message.error(data.message);
+          return false;
+        }
+        this.toggleForm();
+        message.success(data.message);
+      })
+      .then((error) => {
+        this.setState({
+          submit_button_loading: false,
+        });
+        console.log('error', error);
+      });
   };
 
   render() {
-    const { username } = this.state;
+    const { username, submit_button_loading } = this.state;
     return (
       <div className={'form'}>
         <div className={'form__header'}>
@@ -71,7 +100,6 @@ class RegisterForm extends Component {
           <Form.Item
             name="password"
             rules={[
-              { required: true, message: '请输入密码！' },
               ({ getFieldValue }) => ({
                 validator(rule, value) {
                   let repeat_password_value = getFieldValue('repeatPassword'); // 获取再次输入密码的值
@@ -143,6 +171,7 @@ class RegisterForm extends Component {
               type="primary"
               htmlType="submit"
               className="form__content--button"
+              loading={submit_button_loading}
             >
               注册
             </Button>
