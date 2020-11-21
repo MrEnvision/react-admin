@@ -5,6 +5,7 @@ import CodeButton from '../../components/login/CodeButton';
 import { Login } from '../../api/account';
 import { setToken } from '../../utils/token';
 import CryptoJs from 'crypto-js';
+import { withRouter } from 'react-router-dom';
 
 class LoginForm extends Component {
   constructor(props) {
@@ -156,4 +157,4 @@ class LoginForm extends Component {
   }
 }
 
-export default LoginForm;
+export default withRouter(LoginForm);

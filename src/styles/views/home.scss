@@ -1,0 +1,22 @@
+.layout {
+  &__aside {
+  }
+
+  &__wrap {
+    height: 100vh;
+  }
+
+  &__header {
+    z-index: 2;
+    height: 70px;
+    line-height: 70px;
+    background-color: #fff;
+    @include webkit(box-shadow, 0 3px 16px 0 rgba(0, 0, 0, 0.1));
+  }
+
+  &__main {
+    border: 30px solid #f7f7f7;
+    background-color: #fff;
+    padding: 30px;
+  }
+}

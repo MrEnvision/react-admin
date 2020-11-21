@@ -494,3 +494,129 @@ const pwd = CryptoJS.SHA1(password).toString();
 const secretKey = 'sherwinShen';
 const pwd = CryptoJS.AES.encrypt(password, secretKey).toString();
 ```
+
+## 第12课时
+
+### 12.1 withRouter
+
+默认情况下必须是经过路由匹配渲染的组件才拥有路由参数并使用编程式导航的写法，如执行this.props.history.push('/detail')跳转到对应路由的页面，然而不是所有组件都直接与路由相连的，例如项目中LoginForm组件是在Home组件中的，Home组件才是直接与路由相连，当这些组件需要路由参数时，使用withRouter就可以给此组件传入路由参数，此时就可以使用this.props.history.push('/detail')。总结：路由组件可直接获取 history、location 和 match 等属性，而非路由组件必须通过 withRouter 修饰后才能获取这些属性了，比如
+
+```react
+<Route path='/' component={App}/>
+```
+
+App 组件就可以直接获取路由中这些属性了，但是，如果 App 组件中如果有一个子组件 Foo，那么 Foo 就不能直接获取路由中的属性了，必须通过 withRouter 修饰后才能获取到。
+
+```react
+// Foo.js
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+
+class Foo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  go = () =>{
+    this.props.history.push('/home');
+  }
+  
+  render() {
+    return (
+      <div onClick={this.go}>
+        This is Foo.
+      </div>
+    );
+  }
+}
+
+export default withRouter(Foo);
+```
+
+上述 Foo 组件通过 withRouter 加工后的组件 props 会有 history 属性，这时就可以通过 history 的 push 方法跳转路由了。
+
+## 第13课时
+
+### 13.1 私有化路由
+
+原本路由的书写方式：
+
+```react
+<HashRouter>
+  <Switch>
+    <Route component={Home} exact path="/"/>
+    <Route component={About} path="/about"/>
+  </Switch>
+</HashRouter>
+```
+
+我们可以将 ` <Route component={About} path="/about"/>` 整个作为一个组件：
+
+```react
+import React from 'react'
+import {Route} from 'react-router-dom'
+
+const PrivateRoute = ({component: Component, ...rest}) => {
+    return (
+        <Route
+            {...rest}
+            render={routeProps => (
+          			// 此处可以做一些拦截操作，例如验证是否有权限进入
+          			// true ? <Component {...routeProps} /> : <redirct to='/login'/>
+                <Component {...routeProps} />
+            )}
+        />
+    );
+}
+
+export default PrivateRoute
+```
+
+```react
+import PrivateRoute from 'privateRoute.js'
+
+<HashRouter>
+  <Switch>
+    <PrivateRoute component={Home} exact path="/"/>
+  </Switch>
+</HashRouter>
+```
+
+### 13.2 权限验证
+
+1、登录完成，存储 token 至 sessionStorage
+
+```javascript
+export function setToken(data) {
+    sessionStorage.setItem('adminToken', data)
+}
+```
+
+2、在路由跳转的时候在 [13.1 私有化路由](#131 私有化路由) 中跳转进行判断是否有 token
+
+```javascript
+export function getToken() {
+    return sessionStorage.getItem('adminToken')
+}
+```
+
+```react
+import React from 'react'
+import {Route} from 'react-router-dom'
+import {getToken} from 'token.js'
+
+const PrivateRoute = ({component: Component, ...rest}) => {
+    return (
+        <Route
+            {...rest}
+            render={routeProps => (
+          			getToken() ? <Component {...routeProps} /> : <redirct to='/'/>
+            )}
+        />
+    );
+}
+
+export default PrivateRoute
+```
+
