@@ -631,3 +631,90 @@ export default PrivateRoute
 <img src="./noteimg/控制台.jpg" style="zoom:60%;" />
 
 这里的路由权限不是说是否有权限登录该路由，而是针对不同的用户权限，显示不同的路由列表，如图所示的路由列表，我们是通过自定义的渲染函数进行渲染的，因此可以在该渲染函数的生命周期 componentDidMount 中添加一层“拦截”，实现过滤路由。
+
+## 第16课时
+
+### 16.1 自动化工程-生成组件
+
+```jsx
+import React, { Component } from 'react';
+import { Switch } from 'react-router-dom';
+import PrivateRoute from '../../components/privateRoute';
+
+import User from './../user/index';
+import UserAdd from '../user/userAdd';
+
+class Content extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    return (
+      <div className="content">
+        <Switch>
+          <PrivateRoute component={User} path="/index/user/list" />
+          <PrivateRoute component={UserAdd} path="/index/user/add" />
+        </Switch>
+      </div>
+    );
+  }
+}
+
+export default Content;
+```
+
+如上面代码所示，每需要一个路由就引入一个组件，并添加对应的PrivateRoute组件，这十分不方便，也不利于配置，因此可以使用自动化工程的方式自动读取。
+
+```jsx
+import React, { Component } from 'react';
+import { Switch } from 'react-router-dom';
+import PrivateRoute from '../../components/privateRoute';
+
+// 建立上下文件关系
+// 第一个参数：目录; 第二参数：是否查找子级目录; 第三参数：指定查找到文件
+const files = require.context("./../views/", true, /\.js$/);
+const Components = [];
+files.keys().map((key) => {
+  if (key.includes("./home/") || key.includes("./login/")) {
+    return false;
+  }
+  // path
+  const path = `/index${key.split(".")[1].toLowerCase()}`;
+  // component
+  const component = files(key).default;
+  // 写入对象
+  Components.push({
+    path,
+    component,
+  });
+  return true;
+});
+
+class Content extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    return (
+      <div className="content">
+        <Switch>
+          {Components.map((item, index) => {
+            return (
+              <PrivateRoute component={item.component} path={item.path} key={index}/>
+            );
+          })}
+        </Switch>
+      </div>
+    );
+  }
+}
+
+export default Content;
+```
+
+
+

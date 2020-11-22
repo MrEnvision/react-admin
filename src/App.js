@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import Login from './views/login/index';
-import Home from './views/Home';
+import Home from './views/home';
 import PrivateRoute from './components/privateRoute';
 
 function App() {

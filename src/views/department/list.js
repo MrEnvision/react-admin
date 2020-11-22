@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-class Content extends Component {
+class DepartmentList extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
 
   render() {
-    return <div>this is content</div>;
+    return <div>this is department list.</div>;
   }
 }
 
-export default Content;
+export default DepartmentList;
