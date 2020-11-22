@@ -2,7 +2,7 @@ const router = [
   {
     title: '控制台',
     path: '/index',
-    icon: 'UserOutlined',
+    icon: 'DashboardOutlined',
   },
   {
     title: '用户管理',
@@ -15,7 +15,7 @@ const router = [
   },
   {
     title: '部门管理',
-    icon: 'UserOutlined',
+    icon: 'TeamOutlined',
     path: '/index/department',
     child: [
       { path: '/index/department/list', title: '部门列表', icon: '' },

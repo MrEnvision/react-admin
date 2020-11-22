@@ -620,3 +620,14 @@ const PrivateRoute = ({component: Component, ...rest}) => {
 export default PrivateRoute
 ```
 
+## 第14课时
+
+略。
+
+## 第15课时
+
+### 15.1 路由权限
+
+<img src="./noteimg/控制台.jpg" style="zoom:60%;" />
+
+这里的路由权限不是说是否有权限登录该路由，而是针对不同的用户权限，显示不同的路由列表，如图所示的路由列表，我们是通过自定义的渲染函数进行渲染的，因此可以在该渲染函数的生命周期 componentDidMount 中添加一层“拦截”，实现过滤路由。

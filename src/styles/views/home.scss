@@ -12,11 +12,35 @@
     line-height: 70px;
     background-color: #fff;
     @include webkit(box-shadow, 0 3px 16px 0 rgba(0, 0, 0, 0.1));
+    padding: 0 30px;
   }
 
   &__main {
     border: 30px solid #f7f7f7;
     background-color: #fff;
     padding: 30px;
+  }
+}
+
+.aside {
+  &__logo {
+    font-size: 36px;
+    color: #fff;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  &__title {
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+}
+
+.header {
+  .collapsed-icon {
+    font-size: 20px;
+    cursor: pointer;
   }
 }
