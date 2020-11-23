@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { getToken } from '../../utils/token';
+import { getToken } from '../../utils/cookie';
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (

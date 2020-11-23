@@ -54,10 +54,6 @@ class RegisterForm extends Component {
           submit_button_loading: false,
         });
         const data = response.data;
-        if (data.resCode !== 0) {
-          message.error(data.message);
-          return false;
-        }
         this.toggleForm();
         message.success(data.message);
       })

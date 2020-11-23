@@ -716,5 +716,69 @@ class Content extends Component {
 export default Content;
 ```
 
+## 第17课时
 
+### 17.1 cookie 验证权限
+
+可选插件：
+
+```shell
+$ npm install react-cookies --save
+```
+
+使用：
+
+```js
+import cookie from 'react-cookies'
+
+cookie.save(name, value, [options])
+cookie.remove(name, [options])
+```
+
+我们在登陆的时候后台返回了token和username，可以将其保存在cookie中，并且在请求拦截器中对请求头加上该数据，后台则能够对身份进行验证。
+
+```js
+// 请求拦截
+service.interceptors.request.use(
+  (config) => {
+    // 在发送请求之前做些什么 - 请求头添加内容，权限验证
+    config.headers["Token"] = getToken();
+    config.headers["Username"] = getUsername();
+    return config;
+  },
+  (error) => {
+    // 对请求错误做些什么
+    return Promise.reject(error);
+  }
+);
+```
+
+## 第18课时
+
+### 18.1 响应数据业务逻辑
+
+响应拦截器这边可以基于http code和约定的resCode来做一些全局性的设置：
+
+```js
+// 响应拦截
+service.interceptors.response.use(
+  (response) => {  // httpCode为200时，对响应数据做点什么
+    const data = response.data;
+    // 约定resCode为0时，表示请求成功
+    if (data.resCode === 0) {
+      return response;
+    }
+    // 约定resCode不为0时，表示请求出现问题
+    message.info(data.message); // 全局的错误拦截提示
+    // // 可以针对某些 resCode 值，进行业务逻辑处理，即白名单
+    // if (data.resCode === 1023) {
+    //   console.log();
+    // }
+    return Promise.reject(response); // 进入下方的逻辑，等同于httpCode不为200
+  },
+  (error) => { // httpCode不为200时，对响应错误做点什么
+    return Promise.reject(error);
+  }
+);
+```
 

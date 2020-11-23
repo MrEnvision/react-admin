@@ -3,7 +3,7 @@ import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import CodeButton from '../../components/login/CodeButton';
 import { Login } from '../../api/account';
-import { setToken } from '../../utils/token';
+import { setToken, setUsername } from '../../utils/cookie';
 import CryptoJs from 'crypto-js';
 import { withRouter } from 'react-router-dom';
 
@@ -56,11 +56,8 @@ class LoginForm extends Component {
           submit_button_loading: false,
         });
         const data = response.data;
-        if (data.resCode !== 0) {
-          message.error(data.message);
-          return false;
-        }
         setToken(data.data.token);
+        setUsername(data.data.username);
         this.props.history.push('/index');
         message.success('登录成功！');
       })
@@ -68,7 +65,7 @@ class LoginForm extends Component {
         this.setState({
           submit_button_loading: false,
         });
-        console.log(error);
+        console.log('error', error);
       });
   };
 

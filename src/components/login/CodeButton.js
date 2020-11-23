@@ -43,15 +43,6 @@ class CodeButton extends Component {
 
     GetCode(requestData)
       .then((response) => {
-        const data = response.data;
-        if (data.resCode !== 0) {
-          message.warning(response.data.message);
-          this.setState({
-            button_loading: false,
-            button_text: '获取验证码',
-          });
-          return false;
-        }
         message.success(response.data.message);
         this.countDown();
       })
@@ -60,7 +51,7 @@ class CodeButton extends Component {
           button_loading: false,
           button_text: '重新获取',
         });
-        console.log(error);
+        console.log('error', error);
       });
   };
 
