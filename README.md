@@ -6,7 +6,7 @@
 
 **学习成效**：快速掌握React技术开发，完全自主搭建后台管理系统，路由权限；
 
-
+[TOC]
 
 ## 第1课时
 
@@ -785,3 +785,57 @@ service.interceptors.response.use(
 ## 第19课时
 
 略。
+
+## 第20课时
+
+### 20.1 路由传参
+
+1、params传参（刷新页面后参数不消失，参数会在地址栏显示）
+
+```jsx
+// 传递方式
+// 第一种：路由页面
+<Route path='/link/:id' component={Demo}></Route>
+// 第二种：链接方式
+<Link to={'/link/?id=' + 'xxx'}>首页</Link> 
+<Link to={{pathname:'/link/' + 'xxx'}}>首页</Link>
+// 第三种：js方式
+this.props.history.push('/link/' + 'xxx')
+this.props.history.push({pathname:'/ link /' + 'xxx'})
+
+// 获取参数方式
+this.props.match.params.id // 注意这里是 match 而非 history
+```
+
+2、query传参（刷新页面后参数消失）
+
+```jsx
+// 传递方式
+// 第一种：路由页面
+<Route path='/link' component={Demo}></Route>  // 无需配置 路由跳转并传递参数
+// 第二种：链接方式
+<Link to={{pathname:'/link ',query:{id:22, name:'dahuang'}}}>XX</Link>
+// 第三种：js方式
+this.props.history.push({pathname:'/link',query:{id:22, name:'dahuang'}}) 
+
+// 获取参数方式
+this.props.location.query.name
+```
+
+ 3、state传参（刷新页面后参数消失，state传的参数是加密的）
+
+```jsx
+// 传递方式
+// 第一种：路由页面
+<Route path='/link' component={Demo}></Route>  // 无需配置 路由跳转并传递参数
+// 第二种：链接方式
+ <Link to={{pathname:'/link ',state:{id:12, name:'dahuang'}}}>XX</Link>
+// 第三种：js方式
+this.props.history.push({pathname:'/link',state:{id:12, name:'dahuang'}}) 
+
+// 获取参数方式
+this.props.location.state.name
+```
+
+
+

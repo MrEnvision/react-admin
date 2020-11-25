@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button, Table, Switch, message } from 'antd';
-import { GetList, Delete } from '../../api/department';
+import { Form, Input, Button, Table, Switch, message, Modal } from 'antd';
+import { GetList, Delete, Status } from '../../api/department';
 import './../../styles/views/department.scss';
+import { Link } from 'react-router-dom';
 
 class DepartmentList extends Component {
   constructor(props) {
@@ -10,6 +11,9 @@ class DepartmentList extends Component {
       keyWork: '',
       pageNumber: 1,
       pageSize: 10,
+      id: null,
+      visible: false,
+      confirmLoading: false,
       selectedRowKeys: [],
       dataSource: [],
       columns: [
@@ -24,6 +28,7 @@ class DepartmentList extends Component {
                 checkedChildren="启用"
                 unCheckedChildren="禁用"
                 defaultChecked={rowData.status === '1'}
+                onChange={() => this.onHandlerSwitch(rowData)}
               />
             );
           },
@@ -36,7 +41,16 @@ class DepartmentList extends Component {
           render: (text, rowData) => {
             return (
               <div className="inline-button">
-                <Button type="primary">编辑</Button>
+                <Button type="primary">
+                  <Link
+                    to={{
+                      pathname: '/index/department/add',
+                      state: { id: rowData.id },
+                    }}
+                  >
+                    编辑
+                  </Link>
+                </Button>
                 <Button onClick={() => this.deleteData(rowData.id)}>
                   删除
                 </Button>
@@ -71,7 +85,6 @@ class DepartmentList extends Component {
   // 请求数据
   loadData = () => {
     const { pageNumber, pageSize, keyWork } = this.state;
-    console.log(this.state);
     GetList({ pageNumber, pageSize, keyWork })
       .then((response) => {
         const responseData = response.data.data;
@@ -88,8 +101,22 @@ class DepartmentList extends Component {
 
   // 删除数据
   deleteData = (id) => {
-    Delete({ id })
+    this.setState({
+      visible: true,
+      id,
+    });
+  };
+  handleOk = () => {
+    this.setState({
+      confirmLoading: true,
+    });
+    Delete({ id: this.state.id })
       .then((response) => {
+        this.setState({
+          visible: false,
+          id: null,
+          confirmLoading: false,
+        });
         message.info(response.data.message);
         this.loadData();
       })
@@ -98,18 +125,32 @@ class DepartmentList extends Component {
       });
   };
 
+  // 禁启用
+  onHandlerSwitch = (data) => {
+    Status({
+      id: data.id,
+      status: data.status !== '1',
+    })
+      .then((response) => {
+        message.info(response.data.message);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
+
   render() {
-    const { dataSource, columns } = this.state;
+    const { dataSource, columns, confirmLoading } = this.state;
     const rowSelection = {
       onChange: this.onCheckbox,
     };
     return (
       <Fragment>
         <Form layout="inline" onFinish={this.onFinish}>
-          <Form.Item label="部门名称" name="name" fieldContext="">
+          <Form.Item label="部门名称" name="name">
             <Input placeholder="请输入部门名称" />
           </Form.Item>
-          <Form.Item fieldContext="">
+          <Form.Item>
             <Button type="primary" htmlType="submit">
               搜索
             </Button>
@@ -125,6 +166,19 @@ class DepartmentList extends Component {
             size="middle"
           />
         </div>
+        <Modal
+          title="提示"
+          okText="确认"
+          cancelText="取消"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={() => {
+            this.setState({ visible: false });
+          }}
+          confirmLoading={confirmLoading}
+        >
+          <p>确定删除此信息？删除后将无法恢复。</p>
+        </Modal>
       </Fragment>
     );
   }

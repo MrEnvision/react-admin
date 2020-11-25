@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Input, InputNumber, Radio, Button, message } from 'antd';
-import { Add } from '../../api/department';
+import { Add, Detailed } from '../../api/department';
 
 const layout = {
   labelCol: { span: 2 },
@@ -15,8 +15,29 @@ class DepartmentAdd extends Component {
     super(props);
     this.state = {
       loading: false,
+      id: null,
     };
   }
+
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.location.state) {
+      return { id: nextProps.location.state.id };
+    }
+    return null;
+  }
+
+  componentDidMount() {
+    this.getDetailed();
+  }
+
+  getDetailed = () => {
+    if (!this.state.id) {
+      return false;
+    }
+    Detailed({ id: this.state.id }).then((response) => {
+      this.refs.form.setFieldsValue(response.data.data);
+    });
+  };
 
   onFinish = (values) => {
     if (!values.name) {
