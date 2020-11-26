@@ -12,7 +12,6 @@ class AsideMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedKeys: [],
       openKeys: [],
     };
   }
@@ -21,15 +20,13 @@ class AsideMenu extends Component {
     const pathname = this.props.location.pathname;
     const menuKey = pathname.split('/').slice(0, 3).join('/');
     this.setState({
-      selectedKeys: [pathname],
       openKeys: [menuKey],
     });
   }
 
   // 选择菜单
-  selectMenu = ({ key, keyPath }) => {
+  selectMenu = ({ keyPath }) => {
     this.setState({
-      selectedKeys: [key],
       openKeys: [keyPath[keyPath.length - 1]],
     });
   };
@@ -89,7 +86,8 @@ class AsideMenu extends Component {
           theme="dark"
           defaultSelectedKeys={['/index']}
           defaultOpenKeys={[]}
-          selectedKeys={this.state.selectedKeys}
+          selectedKeys={[this.props.history.location.pathname]}
+          // selectedKeys={this.state.selectedKeys}
           openKeys={this.state.openKeys}
           onOpenChange={this.openMenu}
           onClick={this.selectMenu}
