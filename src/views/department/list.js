@@ -14,6 +14,8 @@ class DepartmentList extends Component {
       id: null,
       visible: false,
       confirmLoading: false,
+      switchFlag: false,
+      loadingTable: false,
       selectedRowKeys: [],
       dataSource: [],
       columns: [
@@ -51,7 +53,7 @@ class DepartmentList extends Component {
                     编辑
                   </Link>
                 </Button>
-                <Button onClick={() => this.deleteData(rowData.id)}>
+                <Button onClick={() => this.deleteModal(rowData.id)}>
                   删除
                 </Button>
               </div>
@@ -74,6 +76,9 @@ class DepartmentList extends Component {
 
   // 点击搜索
   onFinish = (values) => {
+    if (this.state.loadingTable) {
+      return false;
+    }
     this.setState({
       keyWork: values.name,
       pageNumber: 1,
@@ -85,37 +90,43 @@ class DepartmentList extends Component {
   // 请求数据
   loadData = () => {
     const { pageNumber, pageSize, keyWork } = this.state;
+    this.setState({ loadingTable: true });
     GetList({ pageNumber, pageSize, keyWork })
       .then((response) => {
         const responseData = response.data.data;
+        this.setState({ loadingTable: false });
         if (responseData.data) {
-          this.setState({
-            dataSource: responseData.data,
-          });
+          this.setState({ dataSource: responseData.data });
         }
       })
       .catch((error) => {
+        this.setState({ loadingTable: false });
         console.log('error', error);
       });
   };
 
-  // 删除数据
-  deleteData = (id) => {
-    this.setState({
-      visible: true,
-      id,
-    });
+  // 删除数据modal
+  deleteModal = (id) => {
+    if (!id) {
+      // 批量删除
+      if (this.state.selectedRowKeys.length === 0) {
+        return false;
+      }
+      id = this.state.selectedRowKeys.join();
+    }
+    this.setState({ visible: true, id });
   };
-  handleOk = () => {
-    this.setState({
-      confirmLoading: true,
-    });
+
+  // 删除数据
+  deleteData = () => {
+    this.setState({ confirmLoading: true });
     Delete({ id: this.state.id })
       .then((response) => {
         this.setState({
           visible: false,
           id: null,
           confirmLoading: false,
+          selectedRowKeys: [],
         });
         message.info(response.data.message);
         this.loadData();
@@ -127,20 +138,26 @@ class DepartmentList extends Component {
 
   // 禁启用
   onHandlerSwitch = (data) => {
+    if (this.state.switchFlag) {
+      return false;
+    }
+    this.setState({ switchFlag: true });
     Status({
       id: data.id,
       status: data.status !== '1',
     })
       .then((response) => {
+        this.setState({ switchFlag: false });
         message.info(response.data.message);
       })
       .catch((error) => {
+        this.setState({ switchFlag: false });
         console.log('error', error);
       });
   };
 
   render() {
-    const { dataSource, columns, confirmLoading } = this.state;
+    const { dataSource, columns, confirmLoading, loadingTable } = this.state;
     const rowSelection = {
       onChange: this.onCheckbox,
     };
@@ -164,14 +181,16 @@ class DepartmentList extends Component {
             rowKey="id"
             bordered
             size="middle"
+            loading={loadingTable}
           />
+          <Button onClick={() => this.deleteModal()}>批量删除</Button>
         </div>
         <Modal
           title="提示"
           okText="确认"
           cancelText="取消"
           visible={this.state.visible}
-          onOk={this.handleOk}
+          onOk={this.deleteData}
           onCancel={() => {
             this.setState({ visible: false });
           }}

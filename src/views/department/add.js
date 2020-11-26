@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Input, InputNumber, Radio, Button, message } from 'antd';
-import { Add, Detailed } from '../../api/department';
+import { Add, Detailed, Edit } from '../../api/department';
 
 const layout = {
   labelCol: { span: 2 },
@@ -52,6 +52,12 @@ class DepartmentAdd extends Component {
       message.error('描述不能为空');
       return false;
     }
+    // 确定按钮执行添加或编辑
+    this.state.id ? this.onHandlerEdit(values) : this.onHandlerAdd(values);
+  };
+
+  // 添加
+  onHandlerAdd = (values) => {
     Add(values)
       .then((response) => {
         const data = response.data;
@@ -66,6 +72,21 @@ class DepartmentAdd extends Component {
         this.setState({
           loading: false,
         });
+        console.log('error', error);
+      });
+  };
+
+  // 编辑
+  onHandlerEdit = (values) => {
+    const requestData = values;
+    requestData.id = this.state.id;
+    Edit(requestData)
+      .then((response) => {
+        message.info(response.data.message);
+        this.setState({ loading: false });
+      })
+      .catch((error) => {
+        this.setState({ loading: false });
         console.log('error', error);
       });
   };
