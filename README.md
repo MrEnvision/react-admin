@@ -1,12 +1,12 @@
 # React项目实战
 
-教程官网：http://www.web-jshtml.cn/#/   视频地址：https://www.bilibili.com/video/BV1Hg4y167v6  官方源码：[react-admin](https://github.com/bigbigtime/react-admin)
+教程官网：http://www.web-jshtml.cn/#/   视频地址：https://www.bilibili.com/video/BV1Hg4y167v6
 
 **学习内容**：React v16，react-router4，redux, react-redux，Provider和connect，redux-saga，Redux-thunk，PropTypes，组件之间的通讯，调试工具，生命周期，React Hooks，Ant Design UI，Axios路由拦截；
 
 **学习成效**：快速掌握React技术开发，完全自主搭建后台管理系统，路由权限；
 
-[TOC]
+
 
 ## 第1课时
 
@@ -840,3 +840,176 @@ this.props.location.state.name
 ## 第21课时
 
 略。
+
+## 第22课时
+
+### 22.1 数据类型检测
+
+```js
+import PropTypes from 'prop-types';
+```
+
+propTypes 提供一系列验证器，可用于确保组件接收到的数据类型是有效的。当传入的 prop 值类型不正确时，JavaScript 控制台将会显示警告。出于性能方面的考虑，propTypes 仅在开发模式下进行检查。
+
+```js
+MyComponent.propTypes = {
+  // 你可以将属性声明为 JS 原生类型，默认情况下这些属性都是可选的。
+  optionalArray: PropTypes.array,
+  optionalBool: PropTypes.bool,
+  optionalFunc: PropTypes.func,
+  optionalNumber: PropTypes.number,
+  optionalObject: PropTypes.object,
+  optionalString: PropTypes.string,
+  optionalSymbol: PropTypes.symbol,
+
+  // 任何可被渲染的元素（包括数字、字符串、元素或数组） (或 Fragment) 也包含这些类型。
+  optionalNode: PropTypes.node,
+
+  // 一个 React 元素。
+  optionalElement: PropTypes.element,
+
+  // 一个 React 元素类型（即，MyComponent）。
+  optionalElementType: PropTypes.elementType,
+
+  // 你也可以声明 prop 为类的实例，这里使用 JS 的 instanceof 操作符。
+  optionalMessage: PropTypes.instanceOf(Message),
+
+	// 你可以让你的 prop 只能是特定的值，指定它为枚举类型。
+  optionalEnum: PropTypes.oneOf(['News', 'Photos']),
+
+  // 一个对象可以是几种类型中的任意一个类型
+  optionalUnion: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Message)
+  ]),
+
+  // 可以指定一个数组由某一类型的元素组成
+  optionalArrayOf: PropTypes.arrayOf(PropTypes.number),
+
+  // 可以指定一个对象由某一类型的值组成
+  optionalObjectOf: PropTypes.objectOf(PropTypes.number),
+
+  // 可以指定一个对象由特定的类型值组成
+  optionalObjectWithShape: PropTypes.shape({
+    color: PropTypes.string,
+    fontSize: PropTypes.number
+  }),
+  
+	// An object with warnings on extra properties
+  optionalObjectWithStrictShape: PropTypes.exact({
+    name: PropTypes.string,
+    quantity: PropTypes.number
+  }),   
+
+ 	// 你可以在任何 PropTypes 属性后面加上 `isRequired` ，确保这个 prop 没有被提供时，会打印警告信息。
+  requiredFunc: PropTypes.func.isRequired,  
+  
+  // 任意类型的数据
+  requiredAny: PropTypes.any.isRequired,
+
+  // 你可以指定一个自定义验证器。它在验证失败时应返回一个 Error 对象。
+  // 请不要使用 `console.warn` 或抛出异常，因为这在 `onOfType` 中不会起作用。
+  customProp: function(props, propName, componentName) {
+    if (!/matchme/.test(props[propName])) {
+      return new Error(
+        'Invalid prop `' + propName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  },
+
+  // 你也可以提供一个自定义的 `arrayOf` 或 `objectOf` 验证器。
+  // 它应该在验证失败时返回一个 Error 对象。
+  // 验证器将验证数组或对象中的每个值。验证器的前两个参数
+  // 第一个是数组或对象本身
+  // 第二个是他们当前的键。
+  customArrayProp: PropTypes.arrayOf(function(propValue, key, componentName, location, propFullName) {
+    if (!/matchme/.test(propValue[key])) {
+      return new Error(
+        'Invalid prop `' + propFullName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  })
+};
+```
+
+### 22.2 数据默认值
+
+> 我们可以对组件的props设置默认值：
+
+```js
+// 指定 props 的默认值：
+MyComponent.defaultProps = {
+  name: 'Stranger'
+};
+```
+
+### 22.3 setState
+
+`setState()` 可视为请求而不是立即更新组件的命令，React 会延迟调用它，然后通过一次传递更新多个组件。`setState()` 并不总是立即更新组件。它会批量推迟更新。这使得在调用 `setState()` 后立即读取 `this.state` 成为了隐患。为了消除隐患，请使用 `componentDidUpdate` 或者 `setState` 的回调函数（`setState(updater, callback)`）。
+
+```js
+setState(updater, [callback])
+```
+
+第一个参数可接受函数和对象类型：
+
+```js
+this.setState((state, props) => {
+  return {counter: state.counter + props.step};
+});
+
+this.setState({quantity: 2});
+```
+
+### 22.4 父组件调用子组件方法
+
+在父组件获取子组件的实例
+1、在子组件调用父组件方法，并把子组件实例传回给父组件，（已经存储了子组件的实例）
+2、通过实例调用子组件的方法
+
+```jsx
+class Parent extends Component {
+  constructor(props){
+    super(props);
+    this.state = {};
+  }
+  
+  getRef = (ref) => {
+    this.childComponent = ref;
+    // 此时我们就能在其他地方通过this.childComponent.XXX来使用子组件的方法
+  }
+  
+  render(){
+    return (
+      <Child onRef={this.getRef} />
+    )
+  }
+}
+
+
+class Child extends Component {
+  constructor(props){
+    super(props);
+    this.state = {};
+  }
+  
+  componentDidMount() {
+    this.props.onRef && this.props.onRef()
+  }
+  
+  render(){}
+}
+```
+
+### 22.5 组件封装
+
+组件封装可以考虑分为两块来进行：
+
+- UI组件：负责数据的渲染，通过属性 props 接收外部数据加上 render 函数。
+- 容器组件：axios 数据的获取以及处理逻辑上的事，不负责数据的渲染。
+
+例如，本项目中的tableData组件等。
+

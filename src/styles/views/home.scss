@@ -13,12 +13,16 @@
     background-color: #fff;
     @include webkit(box-shadow, 0 3px 16px 0 rgba(0, 0, 0, 0.1));
     padding: 0 30px;
+    position: fixed;
+    width: 100%;
   }
 
   &__main {
     border: 30px solid #f7f7f7;
     background-color: #fff;
     padding: 30px;
+    margin-top: 70px;
+    min-height: initial;
   }
 }
 

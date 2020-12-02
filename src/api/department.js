@@ -12,28 +12,6 @@ export function Add(data) {
 }
 
 /**
- * 列表
- */
-export function GetList(data) {
-  return service.request({
-    url: '/department/list/',
-    method: 'post',
-    data,
-  });
-}
-
-/**
- * 删除
- */
-export function Delete(data) {
-  return service.request({
-    url: '/department/delete/',
-    method: 'post',
-    data,
-  });
-}
-
-/**
  * 禁启用
  */
 export function Status(data) {
