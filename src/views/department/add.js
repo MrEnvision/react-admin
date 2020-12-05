@@ -1,14 +1,6 @@
-import React, { Component, Fragment } from 'react';
-import { Form, Input, InputNumber, Radio, Button, message } from 'antd';
-import { Add, Detailed, Edit } from '../../api/department';
-
-const layout = {
-  labelCol: { span: 2 },
-  wrapperCol: { span: 20 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 2 },
-};
+import React, { Component } from 'react';
+import { Detailed } from '../../api/department';
+import FormComponent from '../../components/form';
 
 class DepartmentAdd extends Component {
   constructor(props) {
@@ -16,6 +8,56 @@ class DepartmentAdd extends Component {
     this.state = {
       loading: false,
       id: null,
+      formConfig: {
+        url: 'departmentAdd',
+        initialValues: { number: 1, status: true },
+        setFieldsValue: null,
+        layout: {
+          labelCol: { span: 2 },
+          wrapperCol: { span: 20 },
+        },
+        tailLayout: {
+          wrapperCol: { offset: 2 },
+        },
+      },
+      formItem: [
+        {
+          type: 'Input',
+          label: '部门名称',
+          name: 'name',
+          style: { width: '200px' },
+          placeholder: '请输入部门名称',
+          rules: [{ required: true, message: '请输入部门名称!' }],
+        },
+        {
+          type: 'InputNumber',
+          label: '人员数量',
+          name: 'number',
+          style: { width: '200px' },
+          placeholder: '请输入人员数量',
+          rules: [{ required: true, message: '请输入人员数量!' }],
+          min: 0,
+          max: 100,
+        },
+        {
+          type: 'Radio',
+          label: '禁启用',
+          name: 'status',
+          rules: [{ required: true, message: '请选择禁启用!' }],
+          options: [
+            { label: '禁用', value: false },
+            { label: '启用', value: true },
+          ],
+        },
+        {
+          type: 'TextArea',
+          label: '描述',
+          name: 'content',
+          style: { width: '600px' },
+          placeholder: '请输入描述',
+          rows: 4,
+        },
+      ],
     };
   }
 
@@ -35,98 +77,63 @@ class DepartmentAdd extends Component {
       return false;
     }
     Detailed({ id: this.state.id }).then((response) => {
-      this.refs.form.setFieldsValue(response.data.data);
+      this.setState({
+        formConfig: {
+          ...this.state.formConfig,
+          url: 'departmentEdit',
+          setFieldsValue: response.data.data,
+        },
+      });
     });
   };
 
-  onFinish = (values) => {
-    if (!values.name) {
-      message.error('部门名称不能为空');
-      return false;
-    }
-    if (!values.number || values.number === 0) {
-      message.error('人员数量不能为0');
-      return false;
-    }
-    if (!values.content) {
-      message.error('描述不能为空');
-      return false;
-    }
-    // 确定按钮执行添加或编辑
-    this.state.id ? this.onHandlerEdit(values) : this.onHandlerAdd(values);
-  };
-
-  // 添加
-  onHandlerAdd = (values) => {
-    Add(values)
-      .then((response) => {
-        const data = response.data;
-        message.info(data.message);
-        this.setState({
-          loading: false,
-        });
-        // 重置表单
-        this.refs.form.resetFields();
-      })
-      .catch((error) => {
-        this.setState({
-          loading: false,
-        });
-        console.log('error', error);
-      });
-  };
-
-  // 编辑
-  onHandlerEdit = (values) => {
-    const requestData = values;
-    requestData.id = this.state.id;
-    Edit(requestData)
-      .then((response) => {
-        message.info(response.data.message);
-        this.setState({ loading: false });
-      })
-      .catch((error) => {
-        this.setState({ loading: false });
-        console.log('error', error);
-      });
-  };
+  // onHandlerSubmit = (values) => {
+  //   // 确定按钮执行添加或编辑
+  //   this.state.id ? this.onHandlerEdit(values) : this.onHandlerAdd(values);
+  // };
+  //
+  // // 添加
+  // onHandlerAdd = (values) => {
+  //   Add(values)
+  //     .then((response) => {
+  //       const data = response.data;
+  //       message.info(data.message);
+  //       this.setState({
+  //         loading: false,
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       this.setState({
+  //         loading: false,
+  //       });
+  //       console.log("error", error);
+  //     });
+  // };
+  //
+  // // 编辑
+  // onHandlerEdit = (values) => {
+  //   const requestData = values;
+  //   requestData.id = this.state.id;
+  //   Edit(requestData)
+  //     .then((response) => {
+  //       message.info(response.data.message);
+  //       this.setState({ loading: false });
+  //     })
+  //     .catch((error) => {
+  //       this.setState({ loading: false });
+  //       console.log("error", error);
+  //     });
+  // };
 
   render() {
+    const { formConfig, formItem, id } = this.state;
     return (
-      <Fragment>
-        <Form
-          ref="form"
-          {...layout}
-          initialValues={{ number: 1, status: true }}
-          onFinish={this.onFinish}
-        >
-          <Form.Item label="部门名称" name="name">
-            <Input style={{ width: '200px' }} />
-          </Form.Item>
-          <Form.Item label="人员数量" name="number">
-            <InputNumber style={{ width: '200px' }} min={1} />
-          </Form.Item>
-          <Form.Item label="禁启用" name="status">
-            <Radio.Group>
-              <Radio value={true}>启用</Radio>
-              <Radio value={false}>禁用</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item label="描述" name="content">
-            <Input.TextArea rows={4} style={{ width: '600px' }} />
-          </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ width: '100px' }}
-              loading={this.state.loading}
-            >
-              提交
-            </Button>
-          </Form.Item>
-        </Form>
-      </Fragment>
+      <FormComponent
+        formConfig={formConfig}
+        formItem={formItem}
+        id={id}
+        // submit={this.onHandlerSubmit}
+      />
     );
   }
 }

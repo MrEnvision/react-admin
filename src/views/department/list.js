@@ -62,6 +62,25 @@ class DepartmentList extends Component {
             },
           },
         ],
+        formItem: [
+          {
+            type: 'Input',
+            label: '部门名称',
+            name: 'name',
+            style: { width: '180px' },
+            placeholder: '请输入部门名称',
+          },
+          {
+            type: 'Select',
+            label: '禁启用',
+            name: 'status',
+            style: { width: '100px' },
+            options: [
+              { label: '禁用', value: false },
+              { label: '启用', value: true },
+            ],
+          },
+        ],
       },
     };
   }

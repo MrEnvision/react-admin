@@ -1013,3 +1013,42 @@ class Child extends Component {
 
 例如，本项目中的tableData组件等。
 
+## 第23课时
+
+### 23.1 state之对象的更新
+
+```jsx
+class Demo extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      obj: {
+        item: 'item',
+        obj: 'name'
+      }
+    };
+  }
+  
+  update = (value) => {
+    // 错误做法
+    this.setState({
+      obj: {
+        obj: value,
+      }
+    })
+    // 正确做法
+    this.setState({
+      obj: {
+        ...this.state.obj,
+        obj: value,
+      }
+    });
+  }
+  
+  render(){
+    return ()
+  }
+}
+```
+
+注意，更新state的obj.obj时，如果使用错误方法，则obj.item会被清除，正确的方法是使用es6的语法，在最前面多加一行`...this.state.obj`，因为如果重复的话后面的则会覆盖前面的。

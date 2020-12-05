@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import requestUrl from '../../api/requestUrl';
 import { TableList, TableDelete } from '../../api/table';
 import TableBasis from './table';
+import FormSearch from '../formSearch';
 
 class TableComponent extends Component {
   constructor(props) {
@@ -36,23 +37,6 @@ class TableComponent extends Component {
     this.loadData();
     this.props.onRef && this.props.onRef(this); // 返回子组件实例
   }
-
-  // 点击搜索
-  onFinish = (searchData) => {
-    if (this.state.loadingTable) {
-      return false;
-    }
-    this.setState(
-      {
-        searchData,
-        pageNumber: 1,
-        pageSize: 10,
-      },
-      () => {
-        this.loadData();
-      }
-    );
-  };
 
   // 请求数据
   loadData = () => {
@@ -86,6 +70,23 @@ class TableComponent extends Component {
         this.setState({ loadingTable: false });
         console.log('error', error);
       });
+  };
+
+  // 搜索数据
+  searchData = (searchData) => {
+    if (this.state.loadingTable) {
+      return false;
+    }
+    this.setState(
+      {
+        pageNumber: 1,
+        pageSize: 10,
+        searchData,
+      },
+      () => {
+        this.loadData();
+      }
+    );
   };
 
   // 删除弹框
@@ -156,16 +157,10 @@ class TableComponent extends Component {
     };
     return (
       <Fragment>
-        <Form layout="inline" onFinish={this.onFinish}>
-          <Form.Item label="部门名称" name="name">
-            <Input placeholder="请输入部门名称" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              搜索
-            </Button>
-          </Form.Item>
-        </Form>
+        <FormSearch
+          formItem={this.props.tableConfig.formItem}
+          searchData={this.searchData}
+        />
         <TableBasis
           dataSource={dataSource}
           columns={columns}
