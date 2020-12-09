@@ -1052,3 +1052,125 @@ class Demo extends Component {
 ```
 
 注意，更新state的obj.obj时，如果使用错误方法，则obj.item会被清除，正确的方法是使用es6的语法，在最前面多加一行`...this.state.obj`，因为如果重复的话后面的则会覆盖前面的。
+
+## 第24课时
+
+### 24.1 Redux
+
+```
+npm install --save redux
+```
+
+[Redux](https://www.redux.org.cn) 的 4大核心： Store + State + Action + Reducer
+
+<img src="./noteimg/redux.png" style="zoom:50%;" />
+
+说明：
+
+- Store 类似于数据存储仓库，存储 State 应用的所有状态数据，state是只读的。
+- Action 是事件，应用某个模块请求动作或操作，通过分发 Action 事件（带type属性的对象）执行 Reducer 来修改Store里的state，Action可以携带数据对象，就是告知 Reducer 要更新 Store 的 state。
+- Reducer 是在收到分发的 Action 事件后， 经过reducer处理后，会返回新的状态数据。Reducer接收两个参数：原始的state和Action，返回一个新的state。
+
+**创建Store**
+
+第一种：单个情况
+
+```js
+// index.js
+import { createStore } from "redux";
+
+// 存储的数据
+const initState = {};
+
+// reducer
+const reducer = function (state = initState, action) {
+  return state;
+};
+
+const store = createStore(reducer);
+
+export default store;
+```
+
+第二种：多个组合情况
+
+```js
+// a.js
+const initState1 = {};
+const reducer1 = function (state = initState1, action) {
+  return state;
+};
+export default reducer1;
+
+// b.js
+const initState2 = {};
+const reducer2 = function (state = initState1, action) {
+  return state;
+};
+export default reducer2;
+
+// index
+import { createStore, combineReducer } from "redux";
+import reducer1 from 'a.js';
+import reducer2 from 'b.js';
+
+const allReducer = {
+  reducer1,
+  reducer2,
+};
+const rootReducer = combineReducer(allReducer);
+const store = createStore(rootReducer);
+export default store;
+```
+
+**Action**
+
+```js
+export function addInfo(label, value) {
+  return {
+    type: "ADD_INFO",
+    payload: { label, value }
+  }
+}
+```
+
+**Reducer**
+
+```js
+// 写法1
+export default function(state=initialState, action) {
+  if (action.type === "ADD_STATUS") {
+    const stateData = JSON.parse(JSON.stringify(state)); // 要拷贝处理，不能直接在state上处理
+    stateData.status.push(action.payload);
+    return stateData;
+  }
+  // ....
+}
+
+// 写法2
+export default function(state=initialState, action) {
+  switch (action.type) {
+    case "ADD_INFO": {
+      return { // 要拷贝处理，不能直接在state上处理
+        ...state,
+        info: [...state.info, action.payload]
+      }
+    }
+
+    default:
+      return state;
+  }
+}
+
+```
+
+**调用**
+
+```js
+// 调用页面引入
+import {addInfo} from "./store/action/config.js"
+import Store from "./store/index.js"
+
+store.dispatch(addInfo("禁用", 1)); // 这边参数不一定是这个格式，只需要与reducer中一一对应即可
+```
+
