@@ -1,9 +1,9 @@
 import { createStore, combineReducers } from 'redux';
-import departmentReducer from './reducer/department';
+import configReducer from './reducer/config';
 
 // 可以组合多个reducer
 const allReducer = combineReducers({
-  departmentReducer,
+  configReducer,
 });
 
 const store = createStore(allReducer);

@@ -4,6 +4,7 @@ import Header from './Header';
 import Aside from './Aside';
 import Content from './Content';
 import './../../styles/views/home.scss';
+import { withRouter } from 'react-router-dom';
 
 class Home extends Component {
   constructor(props) {
@@ -46,4 +47,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default withRouter(Home);

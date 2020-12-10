@@ -1061,116 +1061,40 @@ class Demo extends Component {
 npm install --save redux
 ```
 
-[Redux](https://www.redux.org.cn) 的 4大核心： Store + State + Action + Reducer
+Redux的4大核心： Store + State + Action + Reducer
 
 <img src="./noteimg/redux.png" style="zoom:50%;" />
 
-说明：
 
-- Store 类似于数据存储仓库，存储 State 应用的所有状态数据，state是只读的。
-- Action 是事件，应用某个模块请求动作或操作，通过分发 Action 事件（带type属性的对象）执行 Reducer 来修改Store里的state，Action可以携带数据对象，就是告知 Reducer 要更新 Store 的 state。
-- Reducer 是在收到分发的 Action 事件后， 经过reducer处理后，会返回新的状态数据。Reducer接收两个参数：原始的state和Action，返回一个新的state。
 
-**创建Store**
+文档内容详见[redux文档](https://www.redux.org.cn)，个人总结详见[前端学习笔记 - Redux指南](https://sherwinshen.gitbook.io/front-end-blog/frameworks/react/redux)。
 
-第一种：单个情况
+## 第25课时
 
-```js
-// index.js
-import { createStore } from "redux";
-
-// 存储的数据
-const initState = {};
-
-// reducer
-const reducer = function (state = initState, action) {
-  return state;
-};
-
-const store = createStore(reducer);
-
-export default store;
-```
-
-第二种：多个组合情况
-
-```js
-// a.js
-const initState1 = {};
-const reducer1 = function (state = initState1, action) {
-  return state;
-};
-export default reducer1;
-
-// b.js
-const initState2 = {};
-const reducer2 = function (state = initState1, action) {
-  return state;
-};
-export default reducer2;
-
-// index
-import { createStore, combineReducer } from "redux";
-import reducer1 from 'a.js';
-import reducer2 from 'b.js';
-
-const allReducer = {
-  reducer1,
-  reducer2,
-};
-const rootReducer = combineReducer(allReducer);
-const store = createStore(rootReducer);
-export default store;
-```
-
-**Action**
-
-```js
-export function addInfo(label, value) {
-  return {
-    type: "ADD_INFO",
-    payload: { label, value }
-  }
-}
-```
-
-**Reducer**
-
-```js
-// 写法1
-export default function(state=initialState, action) {
-  if (action.type === "ADD_STATUS") {
-    const stateData = JSON.parse(JSON.stringify(state)); // 要拷贝处理，不能直接在state上处理
-    stateData.status.push(action.payload);
-    return stateData;
-  }
-  // ....
-}
-
-// 写法2
-export default function(state=initialState, action) {
-  switch (action.type) {
-    case "ADD_INFO": {
-      return { // 要拷贝处理，不能直接在state上处理
-        ...state,
-        info: [...state.info, action.payload]
-      }
-    }
-
-    default:
-      return state;
-  }
-}
+### 25.1 react-redux
 
 ```
-
-**调用**
-
-```js
-// 调用页面引入
-import {addInfo} from "./store/action/config.js"
-import Store from "./store/index.js"
-
-store.dispatch(addInfo("禁用", 1)); // 这边参数不一定是这个格式，只需要与reducer中一一对应即可
+npm install --save react-redux
 ```
 
+React-Redux 将所有组件分成两大类：UI 组件（presentational component）和容器组件（container component）。
+
+- UI组件（presentational component）
+
+  - 只负责 UI 的呈现，不带有任何业务逻辑
+  - 没有状态（即不使用this.state这个变量）
+  - 所有数据都由参数（this.props）提供
+  - 不使用任何 Redux 的 API
+- 容器组件（container component）
+  - 负责管理数据和业务逻辑，不负责 UI 的呈现
+  - 带有内部状态
+  - 使用 Redux 的 API
+
+React-Redux 的一些关键概念：
+
+- **mapStateToProps** —— return state，尽量取最小范围的值，不要取不需要的state属性，对性能有一定消耗。
+- **mapDispatchToProps** —— return 一个 dispatch 执行一个 action，在组件内可以用 this.props 解构。
+- **Provider** —— 是顶层组件的作用，将store作为上下文提供给全局共享。
+- **connect** —— 组件是局部组件，将某个react组件包装起来，传递指定的state和props给该组件访问。
+
+具体详见[说明文档](https://www.redux.org.cn/docs/basics/UsageWithReact.html)。

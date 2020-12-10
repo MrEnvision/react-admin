@@ -3,9 +3,11 @@ import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import CodeButton from '../../components/login/CodeButton';
 import { Login } from '../../api/account';
-import { setToken, setUsername } from '../../utils/cookie';
 import CryptoJs from 'crypto-js';
 import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { setTokenAction, setUsernameAction } from '../../store/action/config';
 
 class LoginForm extends Component {
   constructor(props) {
@@ -56,8 +58,9 @@ class LoginForm extends Component {
           submit_button_loading: false,
         });
         const data = response.data;
-        setToken(data.data.token);
-        setUsername(data.data.username);
+        // actions
+        this.props.actions.setToken(data.data.token);
+        this.props.actions.setUsername(data.data.username);
         this.props.history.push('/index');
         message.success('登录成功！');
       })
@@ -154,4 +157,16 @@ class LoginForm extends Component {
   }
 }
 
-export default withRouter(LoginForm);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    actions: bindActionCreators(
+      {
+        setToken: setTokenAction,
+        setUsername: setUsernameAction,
+      },
+      dispatch
+    ),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(withRouter(LoginForm));
