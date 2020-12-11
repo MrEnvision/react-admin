@@ -4,6 +4,7 @@ import { Status } from '../../api/department';
 import './../../styles/views/department.scss';
 import { Link } from 'react-router-dom';
 import TableComponent from '../../components/table';
+import FormSearch from '../../components/formSearch';
 
 class DepartmentList extends Component {
   constructor(props) {
@@ -62,6 +63,9 @@ class DepartmentList extends Component {
             },
           },
         ],
+      },
+      formConfig: {
+        url: 'departmentList',
         formItem: [
           {
             type: 'Input',
@@ -116,9 +120,10 @@ class DepartmentList extends Component {
   };
 
   render() {
-    const { tableConfig } = this.state;
+    const { tableConfig, formConfig } = this.state;
     return (
       <Fragment>
+        <FormSearch formConfig={formConfig} />
         <TableComponent
           tableConfig={tableConfig}
           onRef={this.getChildRef}

@@ -1,11 +1,15 @@
 // 容器组件
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button, Modal, message } from 'antd';
-import PropTypes from 'prop-types';
+import { Modal, message } from 'antd';
 import requestUrl from '../../api/requestUrl';
 import { TableList, TableDelete } from '../../api/table';
 import TableBasis from './table';
-import FormSearch from '../formSearch';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {
+  updateDepartmentList,
+  updateDepartmentTotal,
+} from '../../store/action/department';
 
 class TableComponent extends Component {
   constructor(props) {
@@ -14,13 +18,9 @@ class TableComponent extends Component {
       // 请求参数
       pageNumber: 1,
       pageSize: 10,
-      searchData: {},
-      // 数据
-      dataSource: [],
       // 加载提示
       loadingTable: false,
       // 分页
-      total: 0,
       defaultPageSize: 10,
       // 批量选择
       selectedRowKeys: [],
@@ -40,7 +40,8 @@ class TableComponent extends Component {
 
   // 请求数据
   loadData = () => {
-    const { pageNumber, pageSize, searchData } = this.state;
+    const { pageNumber, pageSize } = this.state;
+    const searchData = this.props;
     this.setState({ loadingTable: true });
     const requestData = {
       url: requestUrl[this.props.tableConfig.url],
@@ -60,33 +61,22 @@ class TableComponent extends Component {
         const responseData = response.data.data;
         this.setState({ loadingTable: false });
         if (responseData.data) {
-          this.setState({
-            dataSource: responseData.data,
-            total: responseData.total,
-          });
+          this.setState(
+            {
+              dataSource: responseData.data,
+              total: responseData.total,
+            },
+            () => {
+              this.props.updateData.updateDepartmentList(responseData.data);
+              this.props.updateData.updateDepartmentTotal(responseData.total);
+            }
+          );
         }
       })
       .catch((error) => {
         this.setState({ loadingTable: false });
         console.log('error', error);
       });
-  };
-
-  // 搜索数据
-  searchData = (searchData) => {
-    if (this.state.loadingTable) {
-      return false;
-    }
-    this.setState(
-      {
-        pageNumber: 1,
-        pageSize: 10,
-        searchData,
-      },
-      () => {
-        this.loadData();
-      }
-    );
   };
 
   // 删除弹框
@@ -145,22 +135,18 @@ class TableComponent extends Component {
 
   render() {
     const {
-      dataSource,
       loadingTable,
       defaultPageSize,
       pageNumber,
       confirmLoading,
     } = this.state;
+    const { dataSource, total } = this.props;
     const { columns, rowKey, multiSelect } = this.props.tableConfig;
     const rowSelection = {
       onChange: this.onCheckbox,
     };
     return (
       <Fragment>
-        <FormSearch
-          formItem={this.props.tableConfig.formItem}
-          searchData={this.searchData}
-        />
         <TableBasis
           dataSource={dataSource}
           columns={columns}
@@ -169,7 +155,7 @@ class TableComponent extends Component {
           loading={loadingTable}
           pagination={false}
           onHandlerDelete={() => this.deleteModal()}
-          total={this.state.total}
+          total={total}
           defaultPageSize={defaultPageSize}
           onChangeCurrentPage={this.onChangeCurrentPage}
           current={pageNumber}
@@ -192,13 +178,23 @@ class TableComponent extends Component {
   }
 }
 
-// 校验数据类型
-TableComponent.propTypes = {
-  config: PropTypes.object,
-};
-// 默认
-TableComponent.defaultProps = {
-  batchDelete: true,
+//把store中的数据映射到这个组件变成props
+const mapStateToProps = (state) => {
+  return {
+    dataSource: state.departmentReducer.dataSource,
+    total: state.departmentReducer.total,
+    searchData: state.departmentReducer.searchData,
+  };
 };
 
-export default TableComponent;
+const mapDispatchToProps = (dispatch) => ({
+  updateData: bindActionCreators(
+    {
+      updateDepartmentList,
+      updateDepartmentTotal,
+    },
+    dispatch
+  ),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TableComponent);

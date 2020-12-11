@@ -1,17 +1,27 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, InputNumber, Radio, Select } from 'antd';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {
+  updateDepartmentList,
+  updateDepartmentSearch,
+  updateDepartmentTotal,
+} from '../../store/action/department';
+import requestUrl from '../../api/requestUrl';
+import { TableList } from '../../api/table';
 
 class FormSearch extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
+      searchData: {},
     };
   }
 
   // 初始化form-item
   initFormItem = () => {
-    const { formItem } = this.props;
+    const { formItem } = this.props.formConfig;
     if (!formItem || (formItem && formItem.length === 0)) {
       return null;
     }
@@ -40,7 +50,57 @@ class FormSearch extends Component {
         searchData[key] = values[key];
       }
     }
-    this.props.searchData(searchData);
+    this.searchData(searchData);
+  };
+
+  // 搜索数据
+  searchData = (searchData) => {
+    this.setState(
+      {
+        searchData,
+      },
+      () => {
+        this.props.updateData.updateDepartmentSearch(searchData);
+        this.loadData();
+      }
+    );
+  };
+
+  // 请求数据
+  loadData = () => {
+    const { searchData } = this.state;
+    const requestData = {
+      url: requestUrl[this.props.formConfig.url],
+      data: {
+        pageNumber: 1,
+        pageSize: 10,
+      },
+    };
+    // 筛选项的参数拼接
+    if (Object.keys(searchData).length !== 0) {
+      for (let key in searchData) {
+        requestData.data[key] = searchData[key];
+      }
+    }
+    TableList(requestData)
+      .then((response) => {
+        const responseData = response.data.data;
+        if (responseData.data) {
+          this.setState(
+            {
+              dataSource: responseData.data,
+              total: responseData.total,
+            },
+            () => {
+              this.props.updateData.updateDepartmentTotal(responseData.total);
+              this.props.updateData.updateDepartmentList(responseData.data);
+            }
+          );
+        }
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
   };
 
   // input元素
@@ -145,4 +205,15 @@ class FormSearch extends Component {
   }
 }
 
-export default FormSearch;
+const mapDispatchToProps = (dispatch) => ({
+  updateData: bindActionCreators(
+    {
+      updateDepartmentList,
+      updateDepartmentSearch,
+      updateDepartmentTotal,
+    },
+    dispatch
+  ),
+});
+
+export default connect(null, mapDispatchToProps)(FormSearch);
