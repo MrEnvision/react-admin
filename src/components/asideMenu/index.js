@@ -6,6 +6,7 @@ import {
   UserOutlined,
   DashboardOutlined,
   TeamOutlined,
+  ContactsOutlined,
 } from '@ant-design/icons';
 
 class AsideMenu extends Component {
@@ -46,6 +47,8 @@ class AsideMenu extends Component {
       return <UserOutlined />;
     } else if (icon === 'TeamOutlined') {
       return <TeamOutlined />;
+    } else if (icon === 'ContactsOutlined') {
+      return <ContactsOutlined />;
     }
   };
 

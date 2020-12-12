@@ -22,6 +22,15 @@ const router = [
       { path: '/index/department/add', title: '添加部门', icon: '' },
     ],
   },
+  {
+    title: '职位管理',
+    icon: 'ContactsOutlined',
+    path: '/index/job',
+    child: [
+      { path: '/index/job/list', title: '职位列表', icon: '' },
+      { path: '/index/job/add', title: '添加职位', icon: '' },
+    ],
+  },
 ];
 
 export default router;

@@ -74,6 +74,7 @@ class App extends React.Component {
 1. Switch：在路径相同的情况下，只匹配第一个，这个可以避免重复匹配；例如上面的代码如果没有 Switch 来匹配 /about 的话， Home 和 About 都会显示，但是如果加上 Switch 来匹配 /about 的话，只会显示 Home 是因为第一个被匹配到了，这个时候就需要在 / 上添加 exact 精确匹配来避免了，/ 只有在完全匹配的时候才显示，部分匹配不显示。
 2. exact：精准匹配。
 3. 路由模式：
+
 - HashRouter：使用 URL 中的 hash（#）部分去创建路由，举例来说，用户访问（简单的说就是URL上会带#号），访问地址会变成这种；http://www.example.com/#/xxxxxxxx
 - BrowserRouter：URL 是指向真实 URL 的资源路径，当通过真实 URL 访问网站的时候。意思就是，不带 # 号的实际地址；项目上线后，需要后台处理 url 指向
 - 其他模式略
@@ -1098,3 +1099,83 @@ React-Redux 的一些关键概念：
 - **connect** —— 组件是局部组件，将某个react组件包装起来，传递指定的state和props给该组件访问。
 
 具体详见[说明文档](https://www.redux.org.cn/docs/basics/UsageWithReact.html)。
+
+## 第26课时
+
+### 26.1 Form自定义表单控件
+
+> 在 ant design 的 Form 控件中如果使用自己封装的组件，如何获取 value 值和如何进行表单验证？只要该组件遵循以下的约定，也可以与 Form 组件一起使用：
+>
+> - 提供受控属性 `value` 或其它与 [`valuePropName`](https://ant.design/components/form/#getFieldDecorator-参数) 的值同名的属性。
+> - 提供 `onChange` 事件或 [`trigger`](https://ant.design/components/form/#getFieldDecorator-参数) 的值同名的事件。
+
+```jsx
+class main extends Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  onFinish = (values) => {
+    // 此处可通过获得values
+    // {
+    //   demo: {
+    //     id: ''
+    //   }
+    // }  
+  }
+  
+  render() {
+    return (
+      <Form onFinish={this.onFinish}>
+        <Form.item name={'demo'}>
+          <MyComponent name={'id'} />
+        </Form.item>
+         <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+          >
+            提交
+          </Button>
+        </Form.Item>
+      </Form> 
+    );
+  }
+}
+```
+
+```jsx
+class MyComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: null,
+    }
+  }
+  
+  onValueChange = (value) => {
+     this.setState({ value });
+     this.triggerChange(value);
+  }
+  
+  triggerChange = (changedValue) => {
+    const onChange = this.props.onChange; // form.item 传入自定义组件里有一个onChange函数
+    if (onChange) {
+      onChange({[this.props.name]: changedValue}); // 更改自定义组件外部，使外部能获取到自定义组件的值
+    }
+  };
+  
+  render() {
+    return (
+      <Select
+        value={this.state.value}
+        onChange={onValueChange}
+      >
+        <Option value="rmb">RMB</Option>
+        <Option value="dollar">Dollar</Option>
+      </Select>
+    );
+  }
+}
+```
+

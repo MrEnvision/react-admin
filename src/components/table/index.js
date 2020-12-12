@@ -41,7 +41,7 @@ class TableComponent extends Component {
   // 请求数据
   loadData = () => {
     const { pageNumber, pageSize } = this.state;
-    const searchData = this.props;
+    const searchData = this.props.searchData;
     this.setState({ loadingTable: true });
     const requestData = {
       url: requestUrl[this.props.tableConfig.url],

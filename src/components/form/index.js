@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Form, Input, InputNumber, Radio, message, Select } from 'antd';
 import requestUrl from '../../api/requestUrl';
 import { FormSubmit } from '../../api/form';
+import DynamicSelect from '../dynamicSelect';
 
 class FormComponent extends Component {
   constructor(props) {
@@ -32,6 +33,8 @@ class FormComponent extends Component {
         return this.textAreaElem(item);
       } else if (item.type === 'Select') {
         return this.selectElem(item);
+      } else if (item.type === 'DynamicSelect') {
+        return this.dynamicSelectElem(item);
       } else {
         return null;
       }
@@ -45,10 +48,12 @@ class FormComponent extends Component {
       this.props.submit(values);
       return true;
     }
+    // 格式化参数
+    const paramsData = this.formatData(values);
     // 如果没有传入submit方法则调用统一的方法
     const data = {
       url: requestUrl[this.props.formConfig.url],
-      data: values,
+      data: paramsData,
     };
     // 如果传入id则添加id
     if (this.props.id) {
@@ -67,6 +72,17 @@ class FormComponent extends Component {
         this.setState({ loading: false });
         console.log('error', error);
       });
+  };
+
+  formatData = (values) => {
+    // 深拷贝
+    const requestData = JSON.parse(JSON.stringify(values));
+    const { formatFormKey } = this.props.formConfig;
+    const keyValue = requestData[formatFormKey];
+    if (Object.prototype.toString.call(keyValue) === '[object Object]') {
+      requestData[formatFormKey] = keyValue[formatFormKey];
+    }
+    return requestData;
   };
 
   // input元素
@@ -155,6 +171,28 @@ class FormComponent extends Component {
         </Select>
       </Form.Item>
     );
+  };
+
+  // 动态Select元素
+  dynamicSelectElem = (item) => {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={[{ validator: this.validatorSelect }]}
+        className={'required-icon'}
+      >
+        <DynamicSelect config={item} />
+      </Form.Item>
+    );
+  };
+
+  validatorSelect = (rule, value) => {
+    if (value) {
+      return Promise.resolve();
+    }
+    return Promise.reject('请选择部门名称!');
   };
 
   render() {
