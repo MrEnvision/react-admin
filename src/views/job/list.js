@@ -62,7 +62,28 @@ class JobList extends Component {
       },
       formConfig: {
         url: 'jobList',
-        formItem: [],
+        formatFormKey: 'name',
+        formItem: [
+          {
+            type: 'DynamicSelect',
+            label: '部门名称',
+            name: 'parentId',
+            style: { width: '180px' },
+            placeholder: '请选择部门名称',
+            url: 'departmentList',
+            propsKey: {
+              value: 'id',
+              label: 'name',
+            },
+          },
+          {
+            type: 'Input',
+            label: '职位名称',
+            name: 'jobName',
+            style: { width: '180px' },
+            placeholder: '请输入职位名称',
+          },
+        ],
       },
     };
   }

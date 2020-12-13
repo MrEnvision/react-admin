@@ -1179,3 +1179,44 @@ class MyComponent extends Component {
 }
 ```
 
+### 26.2 插槽
+
+使用插槽：
+
+```jsx
+<Parent>
+  <div>this is slot1</div>
+  <div>this is slot2</div>
+</Parent>
+```
+
+在Parent组件中可以通过如下代码来获取插槽内容：
+
+```jsx
+<Fragment>
+  {this.props.children[0]}
+</Fragment>
+```
+
+注意this.props.children获取所有插槽分三种情况：
+
+- 插槽没有元素的情况，this.props.children 获取的是 undefined。
+- 只有一个元素的情况，就是一个 object 对象。
+- 如果多个元素的情况，就是 Array 数组对象，例如上面的例子两个div就是两个元素。
+
+> 那么如果有多个插槽元素，怎么区分呢？可以通过ref来指定名字。
+
+```jsx
+<Parent>
+  <div ref='slot1'>this is slot1</div>
+  <div ref='slot2'>this is slot2</div>
+</Parent>
+```
+
+```jsx
+<Fragment>
+  // 这里需要区分一个和多个的情况，一个为对象一个为数组
+  { this.props.children && Array.isArray(this.props.children) ? this.props.children.filter(item => item.ref === 'slot1') : this.props.children }
+</Fragment>
+```
+

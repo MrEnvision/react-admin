@@ -9,6 +9,7 @@ import {
 } from '../../store/action/department';
 import requestUrl from '../../api/requestUrl';
 import { TableList } from '../../api/table';
+import DynamicSelect from '../dynamicSelect';
 
 class FormSearch extends Component {
   constructor(props) {
@@ -36,6 +37,8 @@ class FormSearch extends Component {
         return this.textAreaElem(item);
       } else if (item.type === 'Select') {
         return this.selectElem(item);
+      } else if (item.type === 'DynamicSelect') {
+        return this.dynamicSelectElem(item);
       } else {
         return null;
       }
@@ -50,7 +53,20 @@ class FormSearch extends Component {
         searchData[key] = values[key];
       }
     }
-    this.searchData(searchData);
+    // 格式化参数
+    const paramsData = this.formatData(searchData);
+    this.searchData(paramsData);
+  };
+
+  formatData = (values) => {
+    // 深拷贝
+    const requestData = JSON.parse(JSON.stringify(values));
+    const { formatFormKey } = this.props.formConfig;
+    const keyValue = requestData[formatFormKey];
+    if (Object.prototype.toString.call(keyValue) === '[object Object]') {
+      requestData[formatFormKey] = keyValue[formatFormKey];
+    }
+    return requestData;
   };
 
   // 搜索数据
@@ -189,6 +205,28 @@ class FormSearch extends Component {
         </Select>
       </Form.Item>
     );
+  };
+
+  // 动态Select元素
+  dynamicSelectElem = (item) => {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={[{ validator: this.validatorSelect }]}
+        className={item.required === true ? 'required-icon' : ''}
+      >
+        <DynamicSelect config={item} />
+      </Form.Item>
+    );
+  };
+
+  validatorSelect = (rule, value) => {
+    if (value) {
+      return Promise.resolve();
+    }
+    return Promise.reject('请选择部门名称!');
   };
 
   render() {

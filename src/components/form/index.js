@@ -181,8 +181,10 @@ class FormComponent extends Component {
         label={item.label}
         name={item.name}
         key={item.name}
-        rules={[{ validator: this.validatorSelect }]}
-        className={'required-icon'}
+        rules={
+          item.required === true ? [{ validator: this.validatorSelect }] : null
+        }
+        className={item.required === true ? 'required-icon' : ''}
       >
         <DynamicSelect config={item} />
       </Form.Item>

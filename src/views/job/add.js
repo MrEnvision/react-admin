@@ -28,6 +28,7 @@ class JobAdd extends Component {
           style: { width: '200px' },
           placeholder: '请选择部门名称',
           url: 'departmentList',
+          required: true,
           propsKey: {
             value: 'id',
             label: 'name',
