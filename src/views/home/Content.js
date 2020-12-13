@@ -1,7 +1,9 @@
+// react + ant 依赖
 import React, { Component } from 'react';
 import { Switch } from 'react-router-dom';
-import PrivateRoute from '../../components/privateRoute';
-import Components from '../../router/components';
+// 组件
+import PrivateRoute from '../../components/PrivateRoute'; // 自定义路由组件（可进行过滤等操作）
+import Components from '../../router/components'; // 自动化组件
 
 class Content extends Component {
   constructor(props) {

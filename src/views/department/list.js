@@ -1,10 +1,11 @@
+// react + ant 依赖
 import React, { Component, Fragment } from 'react';
 import { Button, Switch, message } from 'antd';
-import { Status } from '../../api/department';
-import './../../styles/views/department.scss';
 import { Link } from 'react-router-dom';
-import TableComponent from '../../components/table';
-import FormSearch from '../../components/formSearch';
+// 接口
+import { Status } from '../../apis/department';
+// 组件
+import TableComponent from '../../components/Table';
 
 class DepartmentList extends Component {
   constructor(props) {
@@ -63,31 +64,43 @@ class DepartmentList extends Component {
             },
           },
         ],
-      },
-      formConfig: {
-        url: 'departmentList',
-        formItem: [
-          {
-            type: 'Input',
-            label: '部门名称',
-            name: 'name',
-            style: { width: '180px' },
-            placeholder: '请输入部门名称',
-          },
-          {
-            type: 'Select',
-            label: '禁启用',
-            name: 'status',
-            style: { width: '100px' },
-            options: [
-              { label: '禁用', value: false },
-              { label: '启用', value: true },
-            ],
-          },
-        ],
+        formConfig: {
+          formLayout: 'inline',
+          submitUrl: 'departmentList',
+          submitBtnText: '搜索',
+          formItem: [
+            {
+              type: 'Input',
+              label: '部门名称',
+              name: 'name',
+              style: { width: '180px' },
+              placeholder: '请输入部门名称',
+            },
+            {
+              type: 'Select',
+              label: '禁启用',
+              name: 'status',
+              style: { width: '100px' },
+              options: [
+                { label: '禁用', value: false },
+                { label: '启用', value: true },
+              ],
+            },
+          ],
+        },
       },
     };
   }
+
+  // 获取子组件实例
+  getChildRef = (ref) => {
+    this.tableComponent = ref; // 存储子组件
+  };
+
+  // 删除
+  onHandlerDelete = (id) => {
+    this.tableComponent.deleteModal(id);
+  };
 
   // 禁启用
   onHandlerSwitch = (data) => {
@@ -109,26 +122,11 @@ class DepartmentList extends Component {
       });
   };
 
-  // 获取子组件实例
-  getChildRef = (ref) => {
-    this.tableComponent = ref; // 存储子组件
-  };
-
-  // 删除
-  onHandlerDelete = (id) => {
-    this.tableComponent.deleteModal(id);
-  };
-
   render() {
-    const { tableConfig, formConfig } = this.state;
+    const { tableConfig } = this.state;
     return (
       <Fragment>
-        <FormSearch formConfig={formConfig} />
-        <TableComponent
-          tableConfig={tableConfig}
-          onRef={this.getChildRef}
-          batchDelete={true}
-        />
+        <TableComponent tableConfig={tableConfig} onRef={this.getChildRef} />
       </Fragment>
     );
   }

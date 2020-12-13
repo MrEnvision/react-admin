@@ -1,16 +1,21 @@
+// react + ant 依赖
 import React, { Component, Fragment } from 'react';
-import FormSearch from '../../components/formSearch';
-import TableComponent from '../../components/table';
 import { Button, message, Switch } from 'antd';
-import { Status } from '../../api/job';
 import { Link } from 'react-router-dom';
+// 接口
+import { Status } from '../../apis/job';
+// 组件
+import TableComponent from '../../components/Table';
 
 class JobList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      // 需要操作的item
+      id: null,
       // 防止switch连续触发
       switchFlag: false,
+      // 表单配置
       tableConfig: {
         url: 'jobList',
         deleteUrl: 'jobDelete',
@@ -59,34 +64,46 @@ class JobList extends Component {
             },
           },
         ],
-      },
-      formConfig: {
-        url: 'jobList',
-        formatFormKey: 'name',
-        formItem: [
-          {
-            type: 'DynamicSelect',
-            label: '部门名称',
-            name: 'parentId',
-            style: { width: '180px' },
-            placeholder: '请选择部门名称',
-            url: 'departmentList',
-            propsKey: {
-              value: 'id',
-              label: 'name',
+        formConfig: {
+          formLayout: 'inline',
+          submitUrl: 'jobList',
+          submitBtnText: '搜索',
+          formatFormKey: 'parentId',
+          formItem: [
+            {
+              type: 'DynamicSelect',
+              label: '部门名称',
+              name: 'parentId',
+              style: { width: '180px' },
+              placeholder: '请选择部门名称',
+              initUrl: 'departmentList',
+              propsKey: {
+                value: 'id',
+                label: 'name',
+              },
             },
-          },
-          {
-            type: 'Input',
-            label: '职位名称',
-            name: 'jobName',
-            style: { width: '180px' },
-            placeholder: '请输入职位名称',
-          },
-        ],
+            {
+              type: 'Input',
+              label: '职位名称',
+              name: 'jobName',
+              style: { width: '180px' },
+              placeholder: '请输入职位名称',
+            },
+          ],
+        },
       },
     };
   }
+
+  // 获取子组件实例
+  getChildRef = (ref) => {
+    this.tableComponent = ref; // 存储子组件
+  };
+
+  // 删除
+  onHandlerDelete = (id) => {
+    this.tableComponent.deleteModal(id);
+  };
 
   // 禁启用
   onHandlerSwitch = (data) => {
@@ -108,26 +125,11 @@ class JobList extends Component {
       });
   };
 
-  // 获取子组件实例
-  getChildRef = (ref) => {
-    this.tableComponent = ref; // 存储子组件
-  };
-
-  // 删除
-  onHandlerDelete = (id) => {
-    this.tableComponent.deleteModal(id);
-  };
-
   render() {
-    const { tableConfig, formConfig } = this.state;
+    const { tableConfig } = this.state;
     return (
       <Fragment>
-        <FormSearch formConfig={formConfig} />
-        <TableComponent
-          tableConfig={tableConfig}
-          onRef={this.getChildRef}
-          batchDelete={true}
-        />
+        <TableComponent tableConfig={tableConfig} onRef={this.getChildRef} />
       </Fragment>
     );
   }

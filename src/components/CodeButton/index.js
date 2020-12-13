@@ -1,6 +1,8 @@
+// react + ant 依赖
 import React, { Component } from 'react';
 import { Button, message } from 'antd';
-import { GetCode } from '../../api/account';
+// 接口
+import { GetCode } from '../../apis/account';
 
 let timer;
 

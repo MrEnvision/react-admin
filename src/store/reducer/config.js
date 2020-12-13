@@ -2,7 +2,7 @@ import { getToken, getUsername } from '../../utils/cookie';
 import { setTokenKey, setUsernameKey } from '../actionType';
 
 const initState = {
-  token: '' || getToken(), // 登录后存储了 token 和 username
+  token: '' || getToken(),
   username: '' || getUsername(),
 };
 

@@ -1,13 +1,18 @@
+// react + ant 依赖
 import React, { Component } from 'react';
 import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
-import CodeButton from '../../components/login/CodeButton';
-import { Login } from '../../api/account';
-import CryptoJs from 'crypto-js';
 import { withRouter } from 'react-router-dom';
+// redux
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { setTokenAction, setUsernameAction } from '../../store/action/config';
+import { setTokenAction, setUsernameAction } from '../../store/actions/config';
+// 组件
+import CodeButton from '../../components/CodeButton/index';
+// 接口
+import { Login } from '../../apis/account';
+// 其他
+import CryptoJs from 'crypto-js';
 
 class LoginForm extends Component {
   constructor(props) {

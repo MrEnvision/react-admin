@@ -1,23 +1,22 @@
+// react + ant 依赖
 import React, { Component } from 'react';
-import { Button, Form, Input, InputNumber, Radio, Select } from 'antd';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import {
-  updateDepartmentList,
-  updateDepartmentSearch,
-  updateDepartmentTotal,
-} from '../../store/action/department';
-import requestUrl from '../../api/requestUrl';
-import { TableList } from '../../api/table';
-import DynamicSelect from '../dynamicSelect';
+import { Button, Form, Input, InputNumber, Radio, message, Select } from 'antd';
+// 接口
+import requestUrl from '../../apis/requestUrl';
+import { FormSubmit } from '../../apis/common';
+// 组件
+import DynamicSelect from '../DynamicSelect';
 
-class FormSearch extends Component {
+class FormComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      searchData: {},
     };
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+    this.refs.form.setFieldsValue(nextProps.formConfig.setFieldsValue);
   }
 
   // 初始化form-item
@@ -39,6 +38,8 @@ class FormSearch extends Component {
         return this.selectElem(item);
       } else if (item.type === 'DynamicSelect') {
         return this.dynamicSelectElem(item);
+      } else if (item.type === 'Slot') {
+        return this.slotElem(item);
       } else {
         return null;
       }
@@ -47,17 +48,39 @@ class FormSearch extends Component {
 
   // 提交表单
   onFinish = (values) => {
-    const searchData = {};
-    for (let key in values) {
-      if (values[key] !== undefined && values[key] !== '') {
-        searchData[key] = values[key];
-      }
-    }
     // 格式化参数
-    const paramsData = this.formatData(searchData);
-    this.searchData(paramsData);
+    const paramsData = this.formatData(values);
+    // 如果有传入submit方法则调用传入的submit方法
+    if (this.props.submit) {
+      this.props.submit(paramsData);
+      return true;
+    }
+    // 如果没有传入submit方法则调用统一的方法
+    const data = {
+      url: requestUrl[this.props.formConfig.submitUrl],
+      data: paramsData,
+    };
+    // 如果传入id则添加id
+    if (this.props.id) {
+      const idName = this.props.idName || 'id';
+      data.data[idName] = this.props.id;
+    }
+    this.setState({ loading: true });
+    FormSubmit(data)
+      .then((response) => {
+        const responseData = response.data;
+        message.info(responseData.message);
+        this.setState({ loading: false });
+        // // 重置表单
+        // this.refs.form.resetFields();
+      })
+      .catch((error) => {
+        this.setState({ loading: false });
+        console.log('error', error);
+      });
   };
 
+  // 格式化参数
   formatData = (values) => {
     // 深拷贝
     const requestData = JSON.parse(JSON.stringify(values));
@@ -67,56 +90,6 @@ class FormSearch extends Component {
       requestData[formatFormKey] = keyValue[formatFormKey];
     }
     return requestData;
-  };
-
-  // 搜索数据
-  searchData = (searchData) => {
-    this.setState(
-      {
-        searchData,
-      },
-      () => {
-        this.props.updateData.updateDepartmentSearch(searchData);
-        this.loadData();
-      }
-    );
-  };
-
-  // 请求数据
-  loadData = () => {
-    const { searchData } = this.state;
-    const requestData = {
-      url: requestUrl[this.props.formConfig.url],
-      data: {
-        pageNumber: 1,
-        pageSize: 10,
-      },
-    };
-    // 筛选项的参数拼接
-    if (Object.keys(searchData).length !== 0) {
-      for (let key in searchData) {
-        requestData.data[key] = searchData[key];
-      }
-    }
-    TableList(requestData)
-      .then((response) => {
-        const responseData = response.data.data;
-        if (responseData.data) {
-          this.setState(
-            {
-              dataSource: responseData.data,
-              total: responseData.total,
-            },
-            () => {
-              this.props.updateData.updateDepartmentTotal(responseData.total);
-              this.props.updateData.updateDepartmentList(responseData.data);
-            }
-          );
-        }
-      })
-      .catch((error) => {
-        console.log('error', error);
-      });
   };
 
   // input元素
@@ -207,6 +180,22 @@ class FormSearch extends Component {
     );
   };
 
+  // slot元素
+  slotElem = (item) => {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={item.rules}
+      >
+        {this.props.children && Array.isArray(this.props.children)
+          ? this.props.children.filter((elem) => elem.ref === item.slotName)
+          : this.props.children}
+      </Form.Item>
+    );
+  };
+
   // 动态Select元素
   dynamicSelectElem = (item) => {
     return (
@@ -214,7 +203,9 @@ class FormSearch extends Component {
         label={item.label}
         name={item.name}
         key={item.name}
-        rules={[{ validator: this.validatorSelect }]}
+        rules={
+          item.required === true ? [{ validator: this.validatorSelect }] : null
+        }
         className={item.required === true ? 'required-icon' : ''}
       >
         <DynamicSelect config={item} />
@@ -230,12 +221,30 @@ class FormSearch extends Component {
   };
 
   render() {
+    const {
+      layout,
+      formLayout,
+      tailLayout,
+      initialValues,
+      submitBtnText,
+    } = this.props.formConfig;
     return (
-      <Form ref="form" layout="inline" onFinish={this.onFinish}>
+      <Form
+        ref="form"
+        {...layout}
+        layout={formLayout}
+        initialValues={initialValues}
+        onFinish={this.onFinish}
+      >
         {this.initFormItem()}
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={this.state.loading}>
-            搜索
+        <Form.Item {...tailLayout}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ width: '100px' }}
+            loading={this.state.loading}
+          >
+            {submitBtnText}
           </Button>
         </Form.Item>
       </Form>
@@ -243,15 +252,4 @@ class FormSearch extends Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  updateData: bindActionCreators(
-    {
-      updateDepartmentList,
-      updateDepartmentSearch,
-      updateDepartmentTotal,
-    },
-    dispatch
-  ),
-});
-
-export default connect(null, mapDispatchToProps)(FormSearch);
+export default FormComponent;

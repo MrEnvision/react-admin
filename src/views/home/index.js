@@ -1,10 +1,13 @@
+// react + ant 依赖
 import React, { Component, Fragment } from 'react';
 import { Layout } from 'antd';
+import { withRouter } from 'react-router-dom';
+// 样式
+import './../../styles/views/home.scss';
+// 组件
 import Header from './Header';
 import Aside from './Aside';
 import Content from './Content';
-import './../../styles/views/home.scss';
-import { withRouter } from 'react-router-dom';
 
 class Home extends Component {
   constructor(props) {

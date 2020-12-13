@@ -1,15 +1,18 @@
+// react + ant 依赖
 import React, { Component } from 'react';
-import { Detailed } from '../../api/department';
-import FormComponent from '../../components/form';
+// 接口
+import { Detailed } from '../../apis/department';
+// 组件
+import FormComponent from '../../components/Form';
 
 class DepartmentAdd extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       id: null,
       formConfig: {
-        url: 'departmentAdd',
+        submitUrl: 'departmentAdd',
+        submitBtnText: '提交',
         initialValues: { number: 1, status: true },
         setFieldsValue: null,
         layout: {
@@ -19,45 +22,46 @@ class DepartmentAdd extends Component {
         tailLayout: {
           wrapperCol: { offset: 2 },
         },
+        formItem: [
+          {
+            type: 'Input',
+            label: '部门名称',
+            name: 'name',
+            style: { width: '200px' },
+            placeholder: '请输入部门名称',
+            rules: [{ required: true, message: '请输入部门名称!' }],
+          },
+          {
+            type: 'InputNumber',
+            label: '人员数量',
+            name: 'number',
+            style: { width: '200px' },
+            placeholder: '请输入人员数量',
+            rules: [{ required: true, message: '请输入人员数量!' }],
+            min: 0,
+            max: 100,
+          },
+          {
+            type: 'Radio',
+            label: '禁启用',
+            name: 'status',
+            rules: [{ required: true, message: '请选择禁启用!' }],
+            options: [
+              { label: '禁用', value: false },
+              { label: '启用', value: true },
+            ],
+          },
+          {
+            type: 'TextArea',
+            label: '描述',
+            name: 'content',
+            style: { width: '600px' },
+            placeholder: '请输入描述',
+            rows: 4,
+          },
+        ],
       },
-      formItem: [
-        {
-          type: 'Input',
-          label: '部门名称',
-          name: 'name',
-          style: { width: '200px' },
-          placeholder: '请输入部门名称',
-          rules: [{ required: true, message: '请输入部门名称!' }],
-        },
-        {
-          type: 'InputNumber',
-          label: '人员数量',
-          name: 'number',
-          style: { width: '200px' },
-          placeholder: '请输入人员数量',
-          rules: [{ required: true, message: '请输入人员数量!' }],
-          min: 0,
-          max: 100,
-        },
-        {
-          type: 'Radio',
-          label: '禁启用',
-          name: 'status',
-          rules: [{ required: true, message: '请选择禁启用!' }],
-          options: [
-            { label: '禁用', value: false },
-            { label: '启用', value: true },
-          ],
-        },
-        {
-          type: 'TextArea',
-          label: '描述',
-          name: 'content',
-          style: { width: '600px' },
-          placeholder: '请输入描述',
-          rows: 4,
-        },
-      ],
+      // loading: false,
     };
   }
 
@@ -80,7 +84,7 @@ class DepartmentAdd extends Component {
       this.setState({
         formConfig: {
           ...this.state.formConfig,
-          url: 'departmentEdit',
+          submitUrl: 'departmentEdit',
           setFieldsValue: response.data.data,
         },
       });
@@ -126,11 +130,10 @@ class DepartmentAdd extends Component {
   // };
 
   render() {
-    const { formConfig, formItem, id } = this.state;
+    const { formConfig, id } = this.state;
     return (
       <FormComponent
         formConfig={formConfig}
-        formItem={formItem}
         id={id}
         // submit={this.onHandlerSubmit}
       />

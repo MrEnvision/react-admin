@@ -1,6 +1,8 @@
+// react + ant 依赖
 import React, { Component } from 'react';
-import AsideMenu from '../../components/asideMenu';
 import { TeamOutlined } from '@ant-design/icons';
+// 组件
+import AsideMenu from '../../components/AsideMenu';
 
 class Aside extends Component {
   constructor(props) {

@@ -1,5 +1,8 @@
+// react + ant 依赖
 import React, { Component, Fragment } from 'react';
+// 样式
 import './../../styles/views/login.scss';
+// 组件
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 

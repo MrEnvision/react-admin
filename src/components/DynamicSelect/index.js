@@ -1,7 +1,9 @@
+// react + ant 依赖
 import React, { Component, Fragment } from 'react';
-import { TableList } from '../../api/table';
-import requestUrl from '../../api/requestUrl';
 import { Select } from 'antd';
+// 接口
+import { TableList } from '../../apis/common';
+import requestUrl from '../../apis/requestUrl';
 
 class DynamicSelect extends Component {
   constructor(props) {
@@ -33,9 +35,9 @@ class DynamicSelect extends Component {
   }
 
   componentDidMount() {
-    if (this.props.config.url) {
+    if (this.props.config.initUrl) {
       TableList({
-        url: requestUrl[this.props.config.url],
+        url: requestUrl[this.props.config.initUrl],
         method: 'post',
         data: {
           pageNumber: 1,

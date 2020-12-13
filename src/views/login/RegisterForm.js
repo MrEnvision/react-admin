@@ -1,8 +1,12 @@
+// react + ant 依赖
 import React, { Component } from 'react';
 import { Button, Col, Form, Input, Row, message } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
-import CodeButton from '../../components/login/CodeButton';
-import { Register } from '../../api/account';
+// 组件
+import CodeButton from '../../components/CodeButton/index';
+// 接口
+import { Register } from '../../apis/account';
+// 其他
 import CryptoJs from 'crypto-js';
 
 class RegisterForm extends Component {
