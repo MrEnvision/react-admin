@@ -1,7 +1,10 @@
 // react + ant 依赖
 import React, { Component, Fragment } from 'react';
+import { Select } from 'antd';
 // 接口
 import { Detailed } from '../../apis/job';
+import { TableList } from '../../apis/common';
+import requestUrl from '../../apis/requestUrl';
 // 组件
 import FormComponent from '../../components/Form';
 
@@ -24,16 +27,10 @@ class JobAdd extends Component {
         formatFormKey: 'parentId',
         formItem: [
           {
-            type: 'DynamicSelect',
+            type: 'Slot',
             label: '部门名称',
             name: 'parentId',
-            style: { width: '200px' },
-            placeholder: '请选择部门名称',
-            initUrl: 'departmentList',
-            propsKey: {
-              value: 'id',
-              label: 'name',
-            },
+            slotName: 'department',
           },
           {
             type: 'Input',
@@ -63,6 +60,7 @@ class JobAdd extends Component {
           },
         ],
       },
+      select: [],
     };
   }
 
@@ -75,6 +73,7 @@ class JobAdd extends Component {
 
   componentDidMount() {
     this.getDetailed();
+    this.getSelectList();
   }
 
   getDetailed = () => {
@@ -92,11 +91,45 @@ class JobAdd extends Component {
     });
   };
 
+  getSelectList = () => {
+    const data = {
+      url: requestUrl['departmentList'],
+      method: 'post',
+      data: {
+        pageNumber: 1,
+        pageSize: 100,
+      },
+    };
+    // 接口
+    TableList(data).then((response) => {
+      this.setState({
+        select: response.data.data.data,
+      });
+    });
+  };
+
   render() {
-    const { formConfig, id } = this.state;
+    const { formConfig, id, select } = this.state;
     return (
       <Fragment>
-        <FormComponent formConfig={formConfig} id={id} idName="jobId" />
+        <FormComponent formConfig={formConfig} id={id} idName="jobId">
+          {/** 插槽 */}
+          <Select
+            ref="department"
+            style={{ width: '200px' }}
+            placeholder={'请选择部门名称'}
+            value={select}
+          >
+            {this.state.select &&
+              this.state.select.map((elem) => {
+                return (
+                  <Select.Option value={elem.id} key={elem.id}>
+                    {elem.name}
+                  </Select.Option>
+                );
+              })}
+          </Select>
+        </FormComponent>
       </Fragment>
     );
   }
