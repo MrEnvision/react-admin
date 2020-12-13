@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import FormComponent from '../../components/form';
 import './../../styles/views/job.scss';
+import { Detailed } from '../../api/job';
 
 class JobAdd extends Component {
   constructor(props) {
@@ -62,11 +63,42 @@ class JobAdd extends Component {
     };
   }
 
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.location.state) {
+      return { id: nextProps.location.state.id };
+    }
+    return null;
+  }
+
+  componentDidMount() {
+    this.getDetailed();
+  }
+
+  getDetailed = () => {
+    if (!this.state.id) {
+      return false;
+    }
+    Detailed({ id: this.state.id }).then((response) => {
+      this.setState({
+        formConfig: {
+          ...this.state.formConfig,
+          url: 'jobEdit',
+          setFieldsValue: response.data.data,
+        },
+      });
+    });
+  };
+
   render() {
     const { formConfig, formItem, id } = this.state;
     return (
       <Fragment>
-        <FormComponent formConfig={formConfig} formItem={formItem} id={id} />
+        <FormComponent
+          formConfig={formConfig}
+          formItem={formItem}
+          id={id}
+          idName="jobId"
+        />
       </Fragment>
     );
   }

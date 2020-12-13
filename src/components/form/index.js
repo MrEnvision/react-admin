@@ -57,7 +57,8 @@ class FormComponent extends Component {
     };
     // 如果传入id则添加id
     if (this.props.id) {
-      data.data.id = this.props.id;
+      const idName = this.props.idName || 'id';
+      data.data[idName] = this.props.id;
     }
     this.setState({ loading: true });
     FormSubmit(data)

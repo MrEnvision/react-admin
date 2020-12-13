@@ -12,6 +12,26 @@ class DynamicSelect extends Component {
     };
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // 1、静态的，无法获取 this.state，2、必须有返回
+    let { value } = nextProps;
+    let { name } = nextProps.config;
+    if (!value) {
+      return false;
+    }
+    // 判断是否是JSON对象
+    if (Object.prototype.toString.call(value) === '[object Object]') {
+      value = value[name];
+    }
+    if (value !== prevState.value) {
+      return {
+        value: value,
+      };
+    }
+    // 直接放在最后面
+    return null;
+  }
+
   componentDidMount() {
     if (this.props.config.url) {
       TableList({
